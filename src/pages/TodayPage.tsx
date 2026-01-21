@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import type { Todo } from '@/types/types';
 import dayjs from 'dayjs';
 import { useState } from 'react';
-import { Trash2, Pencil } from 'lucide-react';
+import { Trash2, Pencil, Clock4, CircleCheck, ListTodo } from 'lucide-react';
 
 export default function TodayPage() {
   const [viewDate, setViewDate] = useState(dayjs());
@@ -49,6 +49,13 @@ export default function TodayPage() {
     };
   });
 
+  const totalCount = mockTodos.length;
+  const completedCount = mockTodos.filter(
+    (t) => t.status === 'completed',
+  ).length;
+  const completedRate =
+    totalCount > 0 ? Math.floor((completedCount / totalCount) * 100) : 0;
+
   return (
     <div className="flex flex-col m-auto w-full max-w-175 mt-7">
       <section>
@@ -61,7 +68,14 @@ export default function TodayPage() {
           {daysInWeek.map((day) => (
             <li key={day.fullDate} className="text-center">
               <div>{day.dayName}</div>
-              <Button className="text-xl" variant={'ghost'}>
+              <Button
+                className={`text-xl transition-all ${day.fullDate === viewDate.format('YYYY-MM-DD') ? 'p-6 text-2xl' : 'text-gray-600'}`}
+                variant={
+                  day.fullDate === viewDate.format('YYYY-MM-DD')
+                    ? 'default'
+                    : 'ghost'
+                }
+              >
                 {day.dateNumber}
               </Button>
             </li>
@@ -70,6 +84,32 @@ export default function TodayPage() {
             {'>'}
           </Button>
         </ul>
+      </section>
+
+      <section className="flex justify-between items-center py-2 px-3 m-3">
+        <div>
+          <h3>Total Focus Time</h3>
+          <div className="flex gap-2">
+            <Clock4 />
+            <span>00:00</span>
+          </div>
+        </div>
+
+        <div>
+          <h3>Complete Rate</h3>
+          <div className="flex gap-2">
+            <CircleCheck />
+            <span>{`${completedRate}%`}</span>
+          </div>
+        </div>
+
+        <div>
+          <h3>Task Completed</h3>
+          <div className="flex gap-2">
+            <ListTodo />
+            <span>{`${completedCount}/${totalCount}`}</span>
+          </div>
+        </div>
       </section>
 
       <section>
