@@ -76,27 +76,35 @@ export default function TodayPage() {
   return (
     <div className="flex flex-col m-auto w-full max-w-175 mt-7">
       <section>
-        <div className="flex justify-center items-center gap-3">
+        <div className="flex items-center gap-6">
+          <div>
+            <Button
+              className="h-7 p-2 text-xs font-medium border-gray-300"
+              variant="outline"
+              size="sm"
+              onClick={handleGoToday}
+            >
+              Today
+            </Button>
+            <Button
+              className="cursor-pointer text-xl ml-2"
+              variant={'ghost'}
+              onClick={handleGoPrevWeek}
+            >
+              {'<'}
+            </Button>
+            <Button
+              className="cursor-pointer text-xl"
+              variant={'ghost'}
+              onClick={handleGoNextWeek}
+            >
+              {'>'}
+            </Button>
+          </div>
           <h2 className="text-3xl font-bold text-center">{currentMonth}</h2>
-
-          <Button
-            className="h-7 px-2 mt-3 text-xs font-medium border-gray-300"
-            variant="outline"
-            size="sm"
-            onClick={handleGoToday}
-          >
-            Today
-          </Button>
         </div>
 
         <ul className="flex justify-between items-center p-3">
-          <Button
-            className="cursor-pointer  text-2xl"
-            variant={'ghost'}
-            onClick={handleGoPrevWeek}
-          >
-            {'<'}
-          </Button>
           {daysInWeek.map((day) => (
             <li key={day.fullDate} className="text-center">
               <div>{day.dayName}</div>
@@ -109,13 +117,6 @@ export default function TodayPage() {
               </Button>
             </li>
           ))}
-          <Button
-            className="cursor-pointer text-2xl"
-            variant={'ghost'}
-            onClick={handleGoNextWeek}
-          >
-            {'>'}
-          </Button>
         </ul>
       </section>
 
