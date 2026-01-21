@@ -1,44 +1,21 @@
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
-import type { Todo } from '@/types/types';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { Trash2, Pencil, Clock4, CircleCheck, ListTodo } from 'lucide-react';
-import { useSelectedDate, useSetSelectedDate } from '@/stores/useTodoStore';
+import {
+  useSelectedDate,
+  useSetSelectedDate,
+  useTodo,
+} from '@/stores/useTodoStore';
 
 export default function TodayPage() {
+  const todos = useTodo();
   const selectedDate = useSelectedDate();
   const setSelectedDate = useSetSelectedDate();
 
   const [viewDate, setViewDate] = useState(dayjs(selectedDate));
-
-  const mockTodos: Todo[] = [
-    {
-      id: '1',
-      text: "Finish Today's UI",
-      date: dayjs().format('YYYY-MM-DD'),
-      createdAt: Date.now(),
-      status: 'active',
-      totalFocusTime: 0,
-    },
-    {
-      id: '2',
-      text: 'Study shadcn/ui components',
-      date: dayjs().format('YYYY-MM-DD'),
-      createdAt: Date.now(),
-      status: 'completed',
-      totalFocusTime: 0,
-    },
-    {
-      id: '3',
-      text: 'Push code to GitHub',
-      date: dayjs().format('YYYY-MM-DD'),
-      createdAt: Date.now(),
-      status: 'active',
-      totalFocusTime: 0,
-    },
-  ];
 
   const currentMonth = viewDate.format('MMM');
   const startOfWeek = viewDate.startOf('week');
@@ -66,12 +43,18 @@ export default function TodayPage() {
 
   const handleGoNextWeek = () => setViewDate((prev) => prev.add(1, 'week'));
 
-  const totalCount = mockTodos.length;
-  const completedCount = mockTodos.filter(
+  const filteredTodos = todos.filter((t) => t.date === selectedDate);
+  const totalCount = filteredTodos.length;
+  const completedCount = filteredTodos.filter(
     (t) => t.status === 'completed',
   ).length;
   const completedRate =
     totalCount > 0 ? Math.floor((completedCount / totalCount) * 100) : 0;
+  const totalFocusTimeSec = filteredTodos.reduce(
+    (acc, cur) => acc + (cur.totalFocusTime || 0),
+    0,
+  );
+  const formattedFocusTime = formatTime(totalFocusTimeSec);
 
   return (
     <div className="flex flex-col m-auto w-full max-w-175 mt-7">
@@ -125,7 +108,7 @@ export default function TodayPage() {
           <h3>Total Focus Time</h3>
           <div className="flex gap-2">
             <Clock4 />
-            <span>00:00</span>
+            <span>{formattedFocusTime || '00:00:00'}</span>
           </div>
         </div>
 
@@ -152,7 +135,7 @@ export default function TodayPage() {
           <Button>Add</Button>
         </div>
         <ul className="mt-3 ">
-          {mockTodos.map((todo) => (
+          {filteredTodos.map((todo) => (
             <li
               key={todo.id}
               className="flex flex-col justify-between items-center p-2 border-2 rounded-xl gap-3 mb-5"
@@ -172,7 +155,9 @@ export default function TodayPage() {
                 </div>
               </div>
               <div className="flex justify-end items-center w-full">
-                <div className="mr-5">hh:mm</div>
+                <div className="mr-5">
+                  {formatTime(todo.totalFocusTime || 0)}
+                </div>
                 <Button>startFocus</Button>
               </div>
             </li>
@@ -182,3 +167,15 @@ export default function TodayPage() {
     </div>
   );
 }
+
+const formatTime = (totalSeconds: number) => {
+  const hours = Math.floor(totalSeconds / 3600);
+  const mins = Math.floor((totalSeconds % 3600) / 60);
+  const secs = totalSeconds % 60;
+
+  const hDisplay = hours > 0 ? `${hours.toString().padStart(2, '0')}:` : '';
+  const mDisplay = mins.toString().padStart(2, '0');
+  const sDisplay = secs.toString().padStart(2, '0');
+
+  return `${hDisplay}${mDisplay}:${sDisplay}`;
+};
