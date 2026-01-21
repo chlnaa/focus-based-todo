@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { combine, devtools } from 'zustand/middleware';
 import type { Todo } from '../types/types';
+import dayjs from 'dayjs';
 
 const initialTodos: Todo[] = [
   {
@@ -24,7 +25,7 @@ const initialTodos: Todo[] = [
 export const useTodoStore = create(
   devtools(
     combine(
-      { todos: initialTodos },
+      { todos: initialTodos, selectedDate: dayjs().format('YYYY-MM-DD') },
 
       (set) => ({
         addTodo: (text: string, date: string) => {
@@ -84,6 +85,8 @@ export const useTodoStore = create(
             'todo/toggle',
           );
         },
+
+        setSelectedDate: (date: string) => set({ selectedDate: date }),
       }),
     ),
     { name: 'TodoStore' },
@@ -97,3 +100,9 @@ export const useAddTodo = () => useTodoStore((store) => store.addTodo);
 export const useUpdateTodo = () => useTodoStore((store) => store.updateTodo);
 
 export const useDeleteTodo = () => useTodoStore((store) => store.deleteTodo);
+
+export const useSelectedDate = () =>
+  useTodoStore((store) => store.selectedDate);
+
+export const useSetSelectedDate = () =>
+  useTodoStore((store) => store.setSelectedDate);
