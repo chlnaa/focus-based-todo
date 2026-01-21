@@ -5,17 +5,28 @@ import dayjs from 'dayjs';
 import { useState } from 'react';
 import { Trash2, Pencil, Clock4, CircleCheck, ListTodo } from 'lucide-react';
 import {
+  useAddTodo,
+  useDeleteTodo,
   useSelectedDate,
   useSetSelectedDate,
   useTodo,
+  useToggle,
+  useUpdateTodo,
 } from '@/stores/useTodoStore';
+import type { Todo } from '@/types/types';
 
 export default function TodayPage() {
   const todos = useTodo();
+  const addTodo = useAddTodo();
+  const deleteTodo = useDeleteTodo();
+  const updateTodo = useUpdateTodo();
+  const toggleTodo = useToggle();
+
   const selectedDate = useSelectedDate();
   const setSelectedDate = useSetSelectedDate();
 
   const [viewDate, setViewDate] = useState(dayjs(selectedDate));
+  const [text, setText] = useState('');
 
   const currentMonth = viewDate.format('MMM');
   const startOfWeek = viewDate.startOf('week');
@@ -55,6 +66,19 @@ export default function TodayPage() {
     0,
   );
   const formattedFocusTime = formatTime(totalFocusTimeSec);
+
+  const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (text.trim().length === 0) return;
+
+    addTodo(text, selectedDate);
+    setText('');
+  };
+
+  const handleUpdated = (todo: Todo) => {
+    const newStatus = todo.status === 'active' ? 'completed' : 'active';
+    updateTodo(todo.id, { status: newStatus });
+  };
 
   return (
     <div className="flex flex-col m-auto w-full max-w-175 mt-7">
@@ -130,10 +154,19 @@ export default function TodayPage() {
       </section>
 
       <section>
-        <div className="flex">
-          <Input />
+        <form
+          className="flex items-center my-6 ml-2 w-full gap-2"
+          action="submit"
+          onSubmit={handleSubmit}
+        >
+          <Input
+            type="text"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Add todo"
+          />
           <Button>Add</Button>
-        </div>
+        </form>
         <ul className="mt-3 ">
           {filteredTodos.map((todo) => (
             <li
@@ -142,14 +175,17 @@ export default function TodayPage() {
             >
               <div className="flex justify-between items-center w-full">
                 <div>
-                  <Checkbox />
+                  <Checkbox
+                    checked={todo.status === 'completed'}
+                    onCheckedChange={() => toggleTodo(todo.id)}
+                  />
                   <span className="p-2">{todo.text}</span>
                 </div>
                 <div>
-                  <Button variant={'ghost'}>
+                  <Button variant={'ghost'} onClick={() => handleUpdated(todo)}>
                     <Pencil />
                   </Button>
-                  <Button variant={'ghost'}>
+                  <Button variant={'ghost'} onClick={() => deleteTodo(todo.id)}>
                     <Trash2 />
                   </Button>
                 </div>

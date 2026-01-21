@@ -101,6 +101,8 @@ export const useUpdateTodo = () => useTodoStore((store) => store.updateTodo);
 
 export const useDeleteTodo = () => useTodoStore((store) => store.deleteTodo);
 
+export const useToggle = () => useTodoStore((store) => store.toggleTodo);
+
 export const useSelectedDate = () =>
   useTodoStore((store) => store.selectedDate);
 
