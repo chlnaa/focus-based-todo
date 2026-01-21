@@ -5,10 +5,13 @@ import type { Todo } from '@/types/types';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { Trash2, Pencil, Clock4, CircleCheck, ListTodo } from 'lucide-react';
+import { useSelectedDate, useSetSelectedDate } from '@/stores/useTodoStore';
 
 export default function TodayPage() {
-  const [viewDate, setViewDate] = useState(dayjs());
-  void setViewDate;
+  const selectedDate = useSelectedDate();
+  const setSelectedDate = useSetSelectedDate();
+
+  const [viewDate, setViewDate] = useState(dayjs(selectedDate));
 
   const mockTodos: Todo[] = [
     {
@@ -42,12 +45,26 @@ export default function TodayPage() {
 
   const daysInWeek = Array.from({ length: 7 }, (_, i) => {
     const date = startOfWeek.add(i, 'day');
+    const fullDate = date.format('YYYY-MM-DD');
     return {
       dayName: date.format('ddd'),
       dateNumber: date.date(),
-      fullDate: date.format('YYYY-MM-DD'),
+      fullDate,
+      isSelected: fullDate === selectedDate,
+      isToday: fullDate === dayjs().format('YYYY-MM-DD'),
     };
   });
+
+  const handleGoToday = () => {
+    const today = dayjs();
+    setViewDate(today);
+    setSelectedDate(today.format('YYYY-MM-DD'));
+  };
+
+  const handleGoPrevWeek = () =>
+    setViewDate((prev) => prev.subtract(1, 'week'));
+
+  const handleGoNextWeek = () => setViewDate((prev) => prev.add(1, 'week'));
 
   const totalCount = mockTodos.length;
   const completedCount = mockTodos.filter(
@@ -59,28 +76,44 @@ export default function TodayPage() {
   return (
     <div className="flex flex-col m-auto w-full max-w-175 mt-7">
       <section>
-        <div className="text-3xl font-bold text-center">{currentMonth}</div>
+        <div className="flex justify-center items-center gap-3">
+          <h2 className="text-3xl font-bold text-center">{currentMonth}</h2>
+
+          <Button
+            className="h-7 px-2 mt-3 text-xs font-medium border-gray-300"
+            variant="outline"
+            size="sm"
+            onClick={handleGoToday}
+          >
+            Today
+          </Button>
+        </div>
 
         <ul className="flex justify-between items-center p-3">
-          <Button className="cursor-pointer  text-2xl" variant={'ghost'}>
+          <Button
+            className="cursor-pointer  text-2xl"
+            variant={'ghost'}
+            onClick={handleGoPrevWeek}
+          >
             {'<'}
           </Button>
           {daysInWeek.map((day) => (
             <li key={day.fullDate} className="text-center">
               <div>{day.dayName}</div>
               <Button
-                className={`text-xl transition-all ${day.fullDate === viewDate.format('YYYY-MM-DD') ? 'p-6 text-2xl' : 'text-gray-600'}`}
-                variant={
-                  day.fullDate === viewDate.format('YYYY-MM-DD')
-                    ? 'default'
-                    : 'ghost'
-                }
+                className={`text-xl transition-all ${day.isSelected ? 'p-4 text-2xl' : 'text-gray-600'}`}
+                variant={day.isSelected ? 'default' : 'ghost'}
+                onClick={() => setSelectedDate(day.fullDate)}
               >
                 {day.dateNumber}
               </Button>
             </li>
           ))}
-          <Button className="cursor-pointer text-2xl" variant={'ghost'}>
+          <Button
+            className="cursor-pointer text-2xl"
+            variant={'ghost'}
+            onClick={handleGoNextWeek}
+          >
             {'>'}
           </Button>
         </ul>
