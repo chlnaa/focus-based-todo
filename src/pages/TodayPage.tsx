@@ -1,58 +1,13 @@
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import dayjs from 'dayjs';
-import { useState } from 'react';
-import { Trash2, Pencil, Clock4, CircleCheck, ListTodo } from 'lucide-react';
-import {
-  useAddTodo,
-  useDeleteTodo,
-  useSelectedDate,
-  useSetSelectedDate,
-  useTodo,
-  useToggle,
-  useUpdateTodo,
-} from '@/stores/useTodoStore';
-import type { Todo } from '@/types/types';
+import { useSelectedDate, useTodo } from '@/stores/useTodoStore';
+import WeeklyCalendar from '@/features/date/WeeklyCalendar';
+import MiniDashboard from '@/features/dashboard/MiniDashboard';
+import { formatTime } from '@/lib/utils';
+import TodoList from '@/features/todo/TodoList';
 
 export default function TodayPage() {
   const todos = useTodo();
-  const addTodo = useAddTodo();
-  const deleteTodo = useDeleteTodo();
-  const updateTodo = useUpdateTodo();
-  const toggleTodo = useToggle();
 
   const selectedDate = useSelectedDate();
-  const setSelectedDate = useSetSelectedDate();
-
-  const [viewDate, setViewDate] = useState(dayjs(selectedDate));
-  const [text, setText] = useState('');
-
-  const currentMonth = viewDate.format('MMM');
-  const startOfWeek = viewDate.startOf('week');
-
-  const daysInWeek = Array.from({ length: 7 }, (_, i) => {
-    const date = startOfWeek.add(i, 'day');
-    const fullDate = date.format('YYYY-MM-DD');
-    return {
-      dayName: date.format('ddd'),
-      dateNumber: date.date(),
-      fullDate,
-      isSelected: fullDate === selectedDate,
-      isToday: fullDate === dayjs().format('YYYY-MM-DD'),
-    };
-  });
-
-  const handleGoToday = () => {
-    const today = dayjs();
-    setViewDate(today);
-    setSelectedDate(today.format('YYYY-MM-DD'));
-  };
-
-  const handleGoPrevWeek = () =>
-    setViewDate((prev) => prev.subtract(1, 'week'));
-
-  const handleGoNextWeek = () => setViewDate((prev) => prev.add(1, 'week'));
 
   const filteredTodos = todos.filter((t) => t.date === selectedDate);
   const totalCount = filteredTodos.length;
@@ -67,151 +22,16 @@ export default function TodayPage() {
   );
   const formattedFocusTime = formatTime(totalFocusTimeSec);
 
-  const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (text.trim().length === 0) return;
-
-    addTodo(text, selectedDate);
-    setText('');
-  };
-
-  const handleUpdated = (todo: Todo) => {
-    const newStatus = todo.status === 'active' ? 'completed' : 'active';
-    updateTodo(todo.id, { status: newStatus });
-  };
-
   return (
     <div className="flex flex-col m-auto w-full max-w-175 mt-7">
-      <section>
-        <div className="flex items-center gap-6">
-          <div>
-            <Button
-              className="h-7 p-2 text-xs font-medium border-gray-300"
-              variant="outline"
-              size="sm"
-              onClick={handleGoToday}
-            >
-              Today
-            </Button>
-            <Button
-              className="cursor-pointer text-xl ml-2"
-              variant={'ghost'}
-              onClick={handleGoPrevWeek}
-            >
-              {'<'}
-            </Button>
-            <Button
-              className="cursor-pointer text-xl"
-              variant={'ghost'}
-              onClick={handleGoNextWeek}
-            >
-              {'>'}
-            </Button>
-          </div>
-          <h2 className="text-3xl font-bold text-center">{currentMonth}</h2>
-        </div>
-
-        <ul className="flex justify-between items-center p-3">
-          {daysInWeek.map((day) => (
-            <li key={day.fullDate} className="text-center">
-              <div>{day.dayName}</div>
-              <Button
-                className={`text-xl transition-all ${day.isSelected ? 'p-4 text-2xl' : 'text-gray-600'}`}
-                variant={day.isSelected ? 'default' : 'ghost'}
-                onClick={() => setSelectedDate(day.fullDate)}
-              >
-                {day.dateNumber}
-              </Button>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="flex justify-between items-center py-2 px-3 m-3">
-        <div>
-          <h3>Total Focus Time</h3>
-          <div className="flex gap-2">
-            <Clock4 />
-            <span>{formattedFocusTime || '00:00:00'}</span>
-          </div>
-        </div>
-
-        <div>
-          <h3>Complete Rate</h3>
-          <div className="flex gap-2">
-            <CircleCheck />
-            <span>{`${completedRate}%`}</span>
-          </div>
-        </div>
-
-        <div>
-          <h3>Task Completed</h3>
-          <div className="flex gap-2">
-            <ListTodo />
-            <span>{`${completedCount}/${totalCount}`}</span>
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <form
-          className="flex items-center my-6 ml-2 w-full gap-2"
-          action="submit"
-          onSubmit={handleSubmit}
-        >
-          <Input
-            type="text"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Add todo"
-          />
-          <Button>Add</Button>
-        </form>
-        <ul className="mt-3 ">
-          {filteredTodos.map((todo) => (
-            <li
-              key={todo.id}
-              className="flex flex-col justify-between items-center p-2 border-2 rounded-xl gap-3 mb-5"
-            >
-              <div className="flex justify-between items-center w-full">
-                <div>
-                  <Checkbox
-                    checked={todo.status === 'completed'}
-                    onCheckedChange={() => toggleTodo(todo.id)}
-                  />
-                  <span className="p-2">{todo.text}</span>
-                </div>
-                <div>
-                  <Button variant={'ghost'} onClick={() => handleUpdated(todo)}>
-                    <Pencil />
-                  </Button>
-                  <Button variant={'ghost'} onClick={() => deleteTodo(todo.id)}>
-                    <Trash2 />
-                  </Button>
-                </div>
-              </div>
-              <div className="flex justify-end items-center w-full">
-                <div className="mr-5">
-                  {formatTime(todo.totalFocusTime || 0)}
-                </div>
-                <Button>startFocus</Button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <WeeklyCalendar />
+      <MiniDashboard
+        formattedFocusTime={formattedFocusTime}
+        completedRate={completedRate}
+        completedCount={completedCount}
+        totalCount={totalCount}
+      />
+      <TodoList filteredTodos={filteredTodos} />
     </div>
   );
 }
-
-const formatTime = (totalSeconds: number) => {
-  const hours = Math.floor(totalSeconds / 3600);
-  const mins = Math.floor((totalSeconds % 3600) / 60);
-  const secs = totalSeconds % 60;
-
-  const hDisplay = hours > 0 ? `${hours.toString().padStart(2, '0')}:` : '';
-  const mDisplay = mins.toString().padStart(2, '0');
-  const sDisplay = secs.toString().padStart(2, '0');
-
-  return `${hDisplay}${mDisplay}:${sDisplay}`;
-};
