@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
-import { Trash2, Pencil, Clock4, CircleCheck, ListTodo } from 'lucide-react';
+import { Trash2, Pencil } from 'lucide-react';
 import {
   useAddTodo,
   useDeleteTodo,
@@ -13,6 +13,7 @@ import {
 } from '@/stores/useTodoStore';
 import type { Todo } from '@/types/types';
 import WeeklyCalendar from '@/features/date/WeeklyCalendar';
+import MiniDashboard from '@/features/dashboard/MiniDashboard';
 
 export default function TodayPage() {
   const todos = useTodo();
@@ -53,31 +54,12 @@ export default function TodayPage() {
   return (
     <div className="flex flex-col m-auto w-full max-w-175 mt-7">
       <WeeklyCalendar />
-      <section className="flex justify-between items-center py-2 px-3 m-3">
-        <div>
-          <h3>Total Focus Time</h3>
-          <div className="flex gap-2">
-            <Clock4 />
-            <span>{formattedFocusTime || '00:00:00'}</span>
-          </div>
-        </div>
-
-        <div>
-          <h3>Complete Rate</h3>
-          <div className="flex gap-2">
-            <CircleCheck />
-            <span>{`${completedRate}%`}</span>
-          </div>
-        </div>
-
-        <div>
-          <h3>Task Completed</h3>
-          <div className="flex gap-2">
-            <ListTodo />
-            <span>{`${completedCount}/${totalCount}`}</span>
-          </div>
-        </div>
-      </section>
+      <MiniDashboard
+        formattedFocusTime={formattedFocusTime}
+        completedRate={completedRate}
+        completedCount={completedCount}
+        totalCount={totalCount}
+      />
 
       <section>
         <form
