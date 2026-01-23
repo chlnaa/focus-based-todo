@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Play, Square, MoveLeft, Pause } from 'lucide-react';
 import { useState } from 'react';
 import { useInterval } from 'usehooks-ts';
@@ -10,13 +11,17 @@ export default function FocusPage() {
   const [timeLeft, setTimeLeft] = useState(1500);
   const [initialTime, setInitialTime] = useState(1500);
 
+  const [isCustomInputOpen, setIsCustomInputOpen] = useState(false);
+  const [customMinutes, setCustomMinutes] = useState('');
+
   const { hours, minutes, seconds } = formatTimer(timeLeft);
 
-  const handlePreset = (minutes: number) => {
+  const handleSetDuration = (minutes: number) => {
     const seconds = minutes * 60;
+    setStatus('idle');
     setTimeLeft(seconds);
     setInitialTime(seconds);
-    setStatus('idle');
+    setIsCustomInputOpen(false);
   };
 
   const handlePlayClick = () => {
@@ -68,17 +73,40 @@ export default function FocusPage() {
         <div className="flex gap-3 p-2">
           <Button
             variant={initialTime === 1500 ? 'default' : 'outline'}
-            onClick={() => handlePreset(25)}
+            onClick={() => handleSetDuration(25)}
           >
             00:25
           </Button>
           <Button
             variant={initialTime === 3000 ? 'default' : 'outline'}
-            onClick={() => handlePreset(50)}
+            onClick={() => handleSetDuration(50)}
           >
             00:50
           </Button>
-          <Button variant={'outline'}>Custom</Button>
+          <Button
+            variant={'outline'}
+            onClick={() => setIsCustomInputOpen(!isCustomInputOpen)}
+          >
+            Custom
+          </Button>
+
+          {isCustomInputOpen && (
+            <div className="flex gap-2 items-center animate-in fade-in zoom-in duration-200">
+              <Input
+                className="w-24"
+                type="number"
+                placeholder="Minutes"
+                value={customMinutes}
+                onChange={(e) => setCustomMinutes(e.target.value)}
+              />
+              <Button
+                size={'sm'}
+                onClick={() => handleSetDuration(Number(customMinutes))}
+              >
+                Set
+              </Button>
+            </div>
+          )}
         </div>
         <div className="flex gap-6 items-center">
           <Button className="rounded-full w-15 h-15" onClick={handlePlayClick}>
