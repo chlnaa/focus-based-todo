@@ -1,12 +1,21 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  useAddFocusTime,
+  useCurrentFocusTodoId,
+  useTodo,
+} from '@/stores/useTodoStore';
 import { Play, Square, MoveLeft, Pause } from 'lucide-react';
 import { useState } from 'react';
 import { useInterval } from 'usehooks-ts';
 
-type TimerStatus = 'idle' | 'running' | 'paused';
+type TimerStatus = 'idle' | 'running' | 'paused' | 'completed';
 
 export default function FocusPage() {
+  const todos = useTodo();
+  const currentFocusTodoId = useCurrentFocusTodoId();
+  const addFocusTime = useAddFocusTime();
+
   const [status, setStatus] = useState<TimerStatus>('idle');
   const [timeLeft, setTimeLeft] = useState(1500);
   const [initialTime, setInitialTime] = useState(1500);
@@ -15,6 +24,8 @@ export default function FocusPage() {
   const [customMinutes, setCustomMinutes] = useState('');
 
   const { hours, minutes, seconds } = formatTimer(timeLeft);
+
+  const currentTodo = todos.find((t) => t.id === currentFocusTodoId);
 
   const handleSetDuration = (minutes: number) => {
     const seconds = minutes * 60;
@@ -42,11 +53,21 @@ export default function FocusPage() {
       if (timeLeft > 0) {
         setTimeLeft((prev) => prev - 1);
       } else {
-        setStatus('idle');
+        setStatus('completed');
+        handleTimerComplete();
       }
     },
     status === 'running' ? 1000 : null,
   );
+
+  const handleTimerComplete = () => {
+    if (!currentFocusTodoId) return;
+
+    const focusedSeconds = initialTime - timeLeft;
+    if (currentFocusTodoId && currentTodo) {
+      addFocusTime(currentFocusTodoId, focusedSeconds);
+    }
+  };
 
   return (
     <div className="flex flex-col justify-center items-center w-full max-w-175 mt-5 m-auto ">
