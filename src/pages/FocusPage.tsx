@@ -4,7 +4,7 @@ import { formatTime } from '@/lib/utils';
 import { useAddFocusTime, useTodo } from '@/stores/useTodoStore';
 import { Play, Square, MoveLeft, Pause } from 'lucide-react';
 import { useState } from 'react';
-import { useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
 import { useInterval } from 'usehooks-ts';
 
 type TimerStatus = 'idle' | 'running' | 'paused' | 'completed';
@@ -73,9 +73,11 @@ export default function FocusPage() {
   return (
     <div className="flex flex-col justify-center items-center w-full max-w-175 mt-5 m-auto ">
       <header className="relative w-full text-center">
-        <Button variant={'ghost'} className="absolute left-3 top-1">
-          <MoveLeft />
-        </Button>
+        <Link to={'/'} onClick={handleStopClick}>
+          <Button className="absolute left-3 top-1" variant={'ghost'}>
+            <MoveLeft />
+          </Button>
+        </Link>
         <h1 className="text-3xl font-bold">Deep Focus</h1>
       </header>
       <main className="flex flex-col items-center justify-center gap-5 ">
