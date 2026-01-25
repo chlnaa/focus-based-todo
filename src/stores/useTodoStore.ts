@@ -25,7 +25,11 @@ const initialTodos: Todo[] = [
 export const useTodoStore = create(
   devtools(
     combine(
-      { todos: initialTodos, selectedDate: dayjs().format('YYYY-MM-DD') },
+      {
+        todos: initialTodos,
+        selectedDate: dayjs().format('YYYY-MM-DD'),
+        currentFocusTodoId: null as string | null,
+      },
 
       (set) => ({
         addTodo: (text: string, date: string) => {
@@ -87,6 +91,31 @@ export const useTodoStore = create(
         },
 
         setSelectedDate: (date: string) => set({ selectedDate: date }),
+
+        startFocus: (id: string) => {
+          set({ currentFocusTodoId: id }, false, 'todo/startFocus');
+        },
+
+        stopFocus: () => {
+          set({ currentFocusTodoId: null }, false, 'todo/stopFocus');
+        },
+
+        addFocusTime: (id: string, seconds: number) => {
+          set(
+            (state) => ({
+              todos: state.todos.map((todo) =>
+                todo.id === id
+                  ? {
+                      ...todo,
+                      totalFocusTime: (todo.totalFocusTime || 0) + seconds,
+                    }
+                  : todo,
+              ),
+            }),
+            false,
+            'todo/addFocusTime',
+          );
+        },
       }),
     ),
     { name: 'TodoStore' },
@@ -108,3 +137,10 @@ export const useSelectedDate = () =>
 
 export const useSetSelectedDate = () =>
   useTodoStore((store) => store.setSelectedDate);
+
+export const useStartFocus = () => useTodoStore((store) => store.startFocus);
+
+export const useStopFocus = () => useTodoStore((store) => store.stopFocus);
+
+export const useAddFocusTime = () =>
+  useTodoStore((store) => store.addFocusTime);

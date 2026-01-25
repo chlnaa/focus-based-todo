@@ -5,6 +5,7 @@ import App from './App.tsx';
 import { createBrowserRouter, RouterProvider } from 'react-router';
 import NotFound from './pages/NotFound.tsx';
 import TodayPage from './pages/TodayPage.tsx';
+import FocusPage from './pages/FocusPage.tsx';
 
 const router = createBrowserRouter([
   {
@@ -14,6 +15,8 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <TodayPage /> },
       { path: '/today', element: <TodayPage /> },
+      { path: '/focus', element: <FocusPage /> },
+      { path: '/focus/:todoId', element: <FocusPage /> },
     ],
   },
 ]);
