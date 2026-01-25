@@ -6,6 +6,7 @@ import type { Todo } from '@/types/types';
 import { Pencil, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useNavigate } from 'react-router';
 
 interface TodoItemProps {
   todo: Todo;
@@ -14,6 +15,8 @@ interface TodoItemProps {
 }
 
 export default function TodoItems({ todo, onDelete, onUpdate }: TodoItemProps) {
+  const navigate = useNavigate();
+
   const { id, text, status, totalFocusTime } = todo;
   const toggleTodoStatus = useToggleTodo();
 
@@ -78,7 +81,7 @@ export default function TodoItems({ todo, onDelete, onUpdate }: TodoItemProps) {
       </div>
       <div className="flex justify-end items-center w-full">
         <div className="mr-5">{formatTime(totalFocusTime || 0)}</div>
-        <Button>startFocus</Button>
+        <Button onClick={() => navigate(`/focus/${id}`)}>startFocus</Button>
       </div>
     </li>
   );

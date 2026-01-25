@@ -7,13 +7,17 @@ import {
 } from '@/stores/useTodoStore';
 import { Play, Square, MoveLeft, Pause } from 'lucide-react';
 import { useState } from 'react';
+import { useParams } from 'react-router';
 import { useInterval } from 'usehooks-ts';
 
 type TimerStatus = 'idle' | 'running' | 'paused' | 'completed';
 
 export default function FocusPage() {
+  const { todoId } = useParams();
+
   const todos = useTodo();
   const currentFocusTodoId = useCurrentFocusTodoId();
+  const currentTodo = todos.find((t) => t.id === todoId);
   const addFocusTime = useAddFocusTime();
 
   const [status, setStatus] = useState<TimerStatus>('idle');
@@ -24,8 +28,6 @@ export default function FocusPage() {
   const [customMinutes, setCustomMinutes] = useState('');
 
   const { hours, minutes, seconds } = formatTimer(timeLeft);
-
-  const currentTodo = todos.find((t) => t.id === currentFocusTodoId);
 
   const handleSetDuration = (minutes: number) => {
     const seconds = minutes * 60;
@@ -68,6 +70,8 @@ export default function FocusPage() {
       addFocusTime(currentFocusTodoId, focusedSeconds);
     }
   };
+
+  if (!currentTodo) return <div>No todo items found</div>;
 
   return (
     <div className="flex flex-col justify-center items-center w-full max-w-175 mt-5 m-auto ">
@@ -144,7 +148,7 @@ export default function FocusPage() {
       </main>
       <footer className="flex flex-col items-center justify-start my-4 gap-8">
         <div className="text-xl bg-muted px-5 py-2 rounded-3xl">
-          Study to React ts
+          {currentTodo.text}
         </div>
 
         <div className="flex gap-3">

@@ -16,6 +16,7 @@ const router = createBrowserRouter([
       { index: true, element: <TodayPage /> },
       { path: '/today', element: <TodayPage /> },
       { path: '/focus', element: <FocusPage /> },
+      { path: '/focus/:todoId', element: <FocusPage /> },
     ],
   },
 ]);
