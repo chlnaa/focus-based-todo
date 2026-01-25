@@ -20,7 +20,7 @@ export default function TodayPage() {
     (acc, cur) => acc + (cur.totalFocusTime || 0),
     0,
   );
-  const formattedFocusTime = formatTime(totalFocusTimeSec);
+  const formattedFocusTime = formatTime(totalFocusTimeSec).fullTimeDisplay;
 
   return (
     <div className="flex flex-col m-auto w-full max-w-175 mt-7">

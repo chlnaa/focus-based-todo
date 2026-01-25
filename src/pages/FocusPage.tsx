@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { formatTime } from '@/lib/utils';
 import { useAddFocusTime, useTodo } from '@/stores/useTodoStore';
 import { Play, Square, MoveLeft, Pause } from 'lucide-react';
 import { useState } from 'react';
@@ -22,7 +23,7 @@ export default function FocusPage() {
   const [isCustomInputOpen, setIsCustomInputOpen] = useState(false);
   const [customMinutes, setCustomMinutes] = useState('');
 
-  const { hours, minutes, seconds } = formatTimer(timeLeft);
+  const { hours, minutes, seconds } = formatTime(timeLeft);
 
   const handleSetDuration = (minutes: number) => {
     const seconds = minutes * 60;
@@ -149,19 +150,9 @@ export default function FocusPage() {
 
         <div className="flex gap-3">
           <div className="text-muted-foreground">Total Focus Time</div>
-          <div>{currentTodo.totalFocusTime}</div>
+          <div>{formatTime(currentTodo.totalFocusTime).fullTimeDisplay}</div>
         </div>
       </footer>
     </div>
   );
-}
-
-function formatTimer(setTime: number) {
-  const pad = (n: number) => n.toString().padStart(2, '0');
-
-  const hours = pad(Math.floor(setTime / 3600));
-  const minutes = pad(Math.floor((setTime % 3600) / 60));
-  const seconds = pad(setTime % 60);
-
-  return { hours, minutes, seconds };
 }

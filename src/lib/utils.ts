@@ -6,13 +6,14 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const formatTime = (totalSeconds: number) => {
-  const hours = Math.floor(totalSeconds / 3600);
-  const mins = Math.floor((totalSeconds % 3600) / 60);
-  const secs = totalSeconds % 60;
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
 
-  const hDisplay = hours > 0 ? `${hours.toString().padStart(2, '0')}:` : '';
-  const mDisplay = mins.toString().padStart(2, '0');
-  const sDisplay = secs.toString().padStart(2, '0');
+  const hours = h.toString().padStart(2, '0');
+  const minutes = m.toString().padStart(2, '0');
+  const seconds = s.toString().padStart(2, '0');
 
-  return `${hDisplay}${mDisplay}:${sDisplay}`;
+  const fullTimeDisplay = `${hours}:${minutes}:${seconds}`;
+  return { fullTimeDisplay, hours, minutes, seconds };
 };

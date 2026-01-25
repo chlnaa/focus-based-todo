@@ -80,7 +80,9 @@ export default function TodoItems({ todo, onDelete, onUpdate }: TodoItemProps) {
         </div>
       </div>
       <div className="flex justify-end items-center w-full">
-        <div className="mr-5">{formatTime(totalFocusTime || 0)}</div>
+        <div className="mr-5">
+          {formatTime(totalFocusTime || 0).fullTimeDisplay}
+        </div>
         <Button onClick={() => navigate(`/focus/${id}`)}>startFocus</Button>
       </div>
     </li>
