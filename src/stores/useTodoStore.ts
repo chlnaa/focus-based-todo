@@ -105,7 +105,10 @@ export const useTodoStore = create(
             (state) => ({
               todos: state.todos.map((todo) =>
                 todo.id === id
-                  ? { ...todo, totalFocusTime: todo.totalFocusTime + seconds }
+                  ? {
+                      ...todo,
+                      totalFocusTime: (todo.totalFocusTime || 0) + seconds,
+                    }
                   : todo,
               ),
             }),
@@ -137,10 +140,7 @@ export const useSetSelectedDate = () =>
 
 export const useStartFocus = () => useTodoStore((store) => store.startFocus);
 
-export const useSTopFocus = () => useTodoStore((store) => store.stopFocus);
+export const useStopFocus = () => useTodoStore((store) => store.stopFocus);
 
 export const useAddFocusTime = () =>
   useTodoStore((store) => store.addFocusTime);
-
-export const useCurrentFocusTodoId = () =>
-  useTodoStore((store) => store.currentFocusTodoId);

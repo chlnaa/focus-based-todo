@@ -1,10 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  useAddFocusTime,
-  useCurrentFocusTodoId,
-  useTodo,
-} from '@/stores/useTodoStore';
+import { useAddFocusTime, useTodo } from '@/stores/useTodoStore';
 import { Play, Square, MoveLeft, Pause } from 'lucide-react';
 import { useState } from 'react';
 import { useParams } from 'react-router';
@@ -13,10 +9,9 @@ import { useInterval } from 'usehooks-ts';
 type TimerStatus = 'idle' | 'running' | 'paused' | 'completed';
 
 export default function FocusPage() {
-  const { todoId } = useParams();
+  const { todoId } = useParams<{ todoId: string }>();
 
   const todos = useTodo();
-  const currentFocusTodoId = useCurrentFocusTodoId();
   const currentTodo = todos.find((t) => t.id === todoId);
   const addFocusTime = useAddFocusTime();
 
@@ -46,6 +41,7 @@ export default function FocusPage() {
   };
 
   const handleStopClick = () => {
+    handleTimerComplete();
     setStatus('idle');
     setTimeLeft(initialTime);
   };
@@ -63,11 +59,11 @@ export default function FocusPage() {
   );
 
   const handleTimerComplete = () => {
-    if (!currentFocusTodoId) return;
+    if (!todoId) return;
 
     const focusedSeconds = initialTime - timeLeft;
-    if (currentFocusTodoId && currentTodo) {
-      addFocusTime(currentFocusTodoId, focusedSeconds);
+    if (todoId && currentTodo) {
+      addFocusTime(todoId, focusedSeconds);
     }
   };
 
@@ -153,7 +149,7 @@ export default function FocusPage() {
 
         <div className="flex gap-3">
           <div className="text-muted-foreground">Total Focus Time</div>
-          <div>00:00:00</div>
+          <div>{currentTodo.totalFocusTime}</div>
         </div>
       </footer>
     </div>
