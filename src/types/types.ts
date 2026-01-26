@@ -16,4 +16,4 @@ export interface Todo {
   totalFocusTime: number;
 }
 
-export type TodoListVariant = 'groupedByDate' | 'flat';
+export type TodoListVariant = 'today' | 'history';

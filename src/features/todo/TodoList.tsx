@@ -24,7 +24,7 @@ export default function TodoList({ filteredTodos, variant }: TodoListProps) {
 
   return (
     <section>
-      {variant === 'groupedByDate' && <AddTodo onAdd={handleAdd} />}
+      {variant === 'today' && <AddTodo onAdd={handleAdd} />}
 
       <ul className="mt-3 ">
         {filteredTodos.map((todo) => (

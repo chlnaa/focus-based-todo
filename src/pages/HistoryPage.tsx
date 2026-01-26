@@ -25,7 +25,7 @@ export default function HistoryPage() {
   return (
     <div className="flex flex-col max-w-175 m-auto mt-10 border-2 rounded-2xl p-3">
       <div>{sortedDates}</div>
-      <TodoList filteredTodos={historyTodos} variant="flat" />
+      <TodoList filteredTodos={historyTodos} variant="history" />
     </div>
   );
 }
