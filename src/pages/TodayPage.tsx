@@ -31,7 +31,7 @@ export default function TodayPage() {
         completedCount={completedCount}
         totalCount={totalCount}
       />
-      <TodoList filteredTodos={filteredTodos} />
+      <TodoList filteredTodos={filteredTodos} variant="groupedByDate" />
     </div>
   );
 }

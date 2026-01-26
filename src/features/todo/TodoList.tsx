@@ -4,15 +4,16 @@ import {
   useSelectedDate,
   useUpdateTodo,
 } from '@/stores/useTodoStore';
-import type { Todo } from '@/types/types';
+import type { Todo, TodoListVariant } from '@/types/types';
 import AddTodo from './AddTodo';
 import TodoItems from './TodoItems';
 
 interface TodoListProps {
   filteredTodos: Todo[];
+  variant: TodoListVariant;
 }
 
-export default function TodoList({ filteredTodos }: TodoListProps) {
+export default function TodoList({ filteredTodos, variant }: TodoListProps) {
   const selectedDate = useSelectedDate();
 
   const addTodo = useAddTodo();
@@ -23,7 +24,7 @@ export default function TodoList({ filteredTodos }: TodoListProps) {
 
   return (
     <section>
-      <AddTodo onAdd={handleAdd} />
+      {variant === 'groupedByDate' && <AddTodo onAdd={handleAdd} />}
 
       <ul className="mt-3 ">
         {filteredTodos.map((todo) => (
