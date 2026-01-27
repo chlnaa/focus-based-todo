@@ -3,13 +3,13 @@ import { Clock4, CircleCheck, ListTodo } from 'lucide-react';
 interface MiniDashboardProps {
   formattedFocusTime: string;
   completedCount: number;
-  completedRate: number;
+  completionRate: number;
   totalCount: number;
 }
 
 export default function MiniDashboard({
   formattedFocusTime,
-  completedRate,
+  completionRate: completionRate,
   completedCount,
   totalCount,
 }: MiniDashboardProps) {
@@ -27,7 +27,7 @@ export default function MiniDashboard({
         <h3>Complete Rate</h3>
         <div className="flex gap-2">
           <CircleCheck />
-          <span>{`${completedRate}%`}</span>
+          <span>{`${completionRate}%`}</span>
         </div>
       </div>
 
