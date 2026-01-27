@@ -14,7 +14,7 @@ export default function DayHistoryCard({
   stats,
 }: DayHistoryCardProps) {
   return (
-    <section className="border-2 rounded-2xl p-5 flex flex-col gap-3">
+    <section className="flex flex-col gap-3 border-2 rounded-2xl p-5 mb-5">
       <header className="flex justify-between items-center text-lg">
         <div>{date}</div>
         <div className="flex items-center gap-5">

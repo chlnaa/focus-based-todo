@@ -19,6 +19,7 @@ export default function HistoryPage() {
 
   return (
     <div>
+      <h1 className="text-center text-3xl py-4">Focus Log</h1>
       {sortedDates.map((date) => (
         <DayHistoryCard
           key={date}
