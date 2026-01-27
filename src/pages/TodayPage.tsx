@@ -1,23 +1,21 @@
 import { useSelectedDate, useTodo } from '@/stores/useTodoStore';
 import WeeklyCalendar from '@/features/date/WeeklyCalendar';
 import MiniDashboard from '@/features/dashboard/MiniDashboard';
-import { formatTime, getDayStats } from '@/lib/utils';
 import TodoList from '@/features/todo/TodoList';
+import { useDayDashboard } from '@/hooks/useDayDashboard';
 
 export default function TodayPage() {
   const todos = useTodo();
 
   const selectedDate = useSelectedDate();
 
-  const filteredTodos = todos.filter((t) => t.date === selectedDate);
-
-  const dashboardDate = getDayStats(filteredTodos);
-
-  const formattedFocusTime = formatTime(
-    dashboardDate.totalFocusSeconds,
-  ).fullTimeDisplay;
-
-  const { completionRate, completedCount, totalCount } = dashboardDate;
+  const {
+    todosData,
+    formattedFocusTime,
+    completionRate,
+    completedCount,
+    totalCount,
+  } = useDayDashboard(todos, selectedDate);
 
   return (
     <div className="flex flex-col">
@@ -28,7 +26,7 @@ export default function TodayPage() {
         completedCount={completedCount}
         totalCount={totalCount}
       />
-      <TodoList filteredTodos={filteredTodos} />
+      <TodoList filteredTodos={todosData} />
     </div>
   );
 }
