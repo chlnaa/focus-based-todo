@@ -21,6 +21,8 @@ export const formatTime = (totalSeconds: number) => {
 };
 
 export const getDayStats = (dayTodos: Todo[]) => {
+  const totalCount = dayTodos.length;
+
   const totalFocusSeconds = dayTodos.reduce(
     (acc, todo) => acc + (todo.totalFocusTime || 0),
     0,
@@ -36,6 +38,7 @@ export const getDayStats = (dayTodos: Todo[]) => {
       : 0;
 
   return {
+    totalCount,
     totalFocusSeconds,
     completionRate,
     completedCount,
