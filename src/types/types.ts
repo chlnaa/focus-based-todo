@@ -15,5 +15,3 @@ export interface Todo {
   /** Total focus duration in seconds */
   totalFocusTime: number;
 }
-
-export type TodoListVariant = 'today' | 'history';

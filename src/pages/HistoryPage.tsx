@@ -18,7 +18,8 @@ export default function HistoryPage() {
   );
 
   return (
-    <div className="flex flex-col max-w-175 m-auto mt-10 gap-5">
+    <div>
+      <h1 className="text-center text-3xl py-4">Focus Log</h1>
       {sortedDates.map((date) => (
         <DayHistoryCard
           key={date}

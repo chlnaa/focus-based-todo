@@ -16,11 +16,11 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <TodayPage /> },
       { path: '/today', element: <TodayPage /> },
-      { path: '/focus', element: <FocusPage /> },
-      { path: '/focus/:todoId', element: <FocusPage /> },
       { path: '/history', element: <HistoryPage /> },
     ],
   },
+  { path: '/focus', element: <FocusPage /> },
+  { path: '/focus/:todoId', element: <FocusPage /> },
 ]);
 
 createRoot(document.getElementById('root')!).render(
