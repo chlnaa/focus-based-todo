@@ -1,6 +1,8 @@
-import { cn, formatTime, getDayStats } from '@/lib/utils';
+import { formatTime, getDayStats } from '@/lib/utils';
 import type { Todo } from '@/types/types';
 import { CircleCheck, Clock4 } from 'lucide-react';
+import { useNavigate } from 'react-router';
+import HistoryTodoRow from './HistoryTodoRow';
 
 interface DayHistoryCardProps {
   date: string;
@@ -13,8 +15,13 @@ export default function DayHistoryCard({
   dayTodos,
   stats,
 }: DayHistoryCardProps) {
+  const navigate = useNavigate();
+
   return (
-    <section className="flex flex-col gap-3 border-2 rounded-2xl p-5 mb-5">
+    <section
+      className="flex flex-col gap-3 border-2 rounded-2xl p-5 mb-5 cursor-pointer "
+      onClick={() => navigate(`/history/${date}`)}
+    >
       <header className="flex justify-between items-center text-lg">
         <div>{date}</div>
         <div className="flex items-center gap-5">
@@ -31,24 +38,7 @@ export default function DayHistoryCard({
 
       <ul className="text-lg">
         {dayTodos.map((todo) => (
-          <li key={todo.id} className="flex justify-between py-1">
-            <div
-              className={cn(
-                todo.status === 'completed' ? 'text-gray-500 line-through' : '',
-              )}
-            >
-              {todo.text}
-            </div>
-            <div
-              className={cn(
-                todo.status === 'completed'
-                  ? 'text-gray-500 line-through text-sm '
-                  : 'text-muted-foreground font-mono text-sm ',
-              )}
-            >
-              {formatTime(todo.totalFocusTime || 0).fullTimeDisplay}
-            </div>
-          </li>
+          <HistoryTodoRow key={todo.id} todo={todo} />
         ))}
       </ul>
     </section>
