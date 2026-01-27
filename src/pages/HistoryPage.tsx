@@ -1,31 +1,43 @@
-import TodoList from '@/features/todo/TodoList';
+import DayHistoryCard from '@/features/history/DayHistoryCard';
+import { getDayStats } from '@/lib/utils';
 import { useTodo } from '@/stores/useTodoStore';
 import type { Todo } from '@/types/types';
+import { useMemo } from 'react';
 
 export default function HistoryPage() {
-  const todos = useTodo();
-  const historyTodos = todos;
+  const historyTodos = useTodo();
 
-  const todosDate = historyTodos.reduce(
+  const todosByDate = useMemo(
+    () => groupTodosByDate(historyTodos),
+    [historyTodos],
+  );
+
+  const sortedDates = useMemo(
+    () => Object.keys(todosByDate).sort((a, b) => b.localeCompare(a)),
+    [todosByDate],
+  );
+
+  return (
+    <div className="flex flex-col max-w-175 m-auto mt-10 gap-5">
+      {sortedDates.map((date) => (
+        <DayHistoryCard
+          key={date}
+          date={date}
+          dayTodos={todosByDate[date]}
+          stats={getDayStats(todosByDate[date])}
+        />
+      ))}
+    </div>
+  );
+}
+
+const groupTodosByDate = (todos: Todo[]): Record<string, Todo[]> =>
+  todos.reduce(
     (acc, todo) => {
       const dateKey = todo.date;
-
-      if (!acc[dateKey]) {
-        acc[dateKey] = [];
-      }
-
+      if (!acc[dateKey]) acc[dateKey] = [];
       acc[dateKey].push(todo);
       return acc;
     },
     {} as Record<string, Todo[]>,
   );
-
-  const sortedDates = Object.keys(todosDate).sort((a, b) => b.localeCompare(a));
-
-  return (
-    <div className="flex flex-col max-w-175 m-auto mt-10 border-2 rounded-2xl p-3">
-      <div>{sortedDates}</div>
-      <TodoList filteredTodos={historyTodos} variant="history" />
-    </div>
-  );
-}

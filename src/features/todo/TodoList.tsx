@@ -13,9 +13,8 @@ interface TodoListProps {
   variant: TodoListVariant;
 }
 
-export default function TodoList({ filteredTodos, variant }: TodoListProps) {
+export default function TodoList({ filteredTodos }: TodoListProps) {
   const selectedDate = useSelectedDate();
-
   const addTodo = useAddTodo();
   const updateTodo = useUpdateTodo();
   const deleteTodo = useDeleteTodo();
@@ -24,8 +23,7 @@ export default function TodoList({ filteredTodos, variant }: TodoListProps) {
 
   return (
     <section>
-      {variant === 'today' && <AddTodo onAdd={handleAdd} />}
-
+      <AddTodo onAdd={handleAdd} />
       <ul className="mt-3 ">
         {filteredTodos.map((todo) => (
           <TodoItems

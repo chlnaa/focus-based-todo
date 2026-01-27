@@ -1,3 +1,4 @@
+import type { Todo } from '@/types/types';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -14,6 +15,29 @@ export const formatTime = (totalSeconds: number) => {
   const minutes = m.toString().padStart(2, '0');
   const seconds = s.toString().padStart(2, '0');
 
-  const fullTimeDisplay = `${hours}:${minutes}:${seconds}`;
+  const fullTimeDisplay =
+    Number(hours) > 0 ? `${hours}h:${minutes}m` : `${minutes}m:${seconds}s`;
   return { fullTimeDisplay, hours, minutes, seconds };
+};
+
+export const getDayStats = (dayTodos: Todo[]) => {
+  const totalFocusSeconds = dayTodos.reduce(
+    (acc, todo) => acc + (todo.totalFocusTime || 0),
+    0,
+  );
+
+  const completedCount = dayTodos.filter(
+    (todo) => todo.status === 'completed',
+  ).length;
+
+  const completionRate =
+    dayTodos.length > 0
+      ? Math.floor((completedCount / dayTodos.length) * 100)
+      : 0;
+
+  return {
+    totalFocusSeconds,
+    completionRate,
+    completedCount,
+  };
 };
