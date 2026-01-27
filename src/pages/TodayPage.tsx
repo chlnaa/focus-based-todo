@@ -20,7 +20,7 @@ export default function TodayPage() {
   const { completionRate, completedCount, totalCount } = dashboardDate;
 
   return (
-    <div className="flex flex-col m-auto w-full max-w-175 mt-7">
+    <div className="flex flex-col">
       <WeeklyCalendar />
       <MiniDashboard
         formattedFocusTime={formattedFocusTime}
