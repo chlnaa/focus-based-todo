@@ -28,7 +28,7 @@ export default function TodayPage() {
         completedCount={completedCount}
         totalCount={totalCount}
       />
-      <TodoList filteredTodos={filteredTodos} variant="today" />
+      <TodoList filteredTodos={filteredTodos} />
     </div>
   );
 }
