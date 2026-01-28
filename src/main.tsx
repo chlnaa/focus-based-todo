@@ -6,7 +6,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router';
 import NotFound from './pages/NotFound.tsx';
 import TodayPage from './pages/TodayPage.tsx';
 import FocusPage from './pages/FocusPage.tsx';
-import HistoryPage from './pages/HistoryPage.tsx';
+import FocusHistoryPage from './pages/FocusHistoryPage.tsx';
 import HistoryDetail from './features/history/HistoryDetail.tsx';
 
 const router = createBrowserRouter([
@@ -17,7 +17,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <TodayPage /> },
       { path: '/today', element: <TodayPage /> },
-      { path: '/history', element: <HistoryPage /> },
+      { path: '/history', element: <FocusHistoryPage /> },
       { path: '/history/:date', element: <HistoryDetail /> },
     ],
   },
