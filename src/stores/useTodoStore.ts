@@ -1,5 +1,10 @@
 import { create } from 'zustand';
-import { combine, devtools } from 'zustand/middleware';
+import {
+  combine,
+  createJSONStorage,
+  devtools,
+  persist,
+} from 'zustand/middleware';
 import type { Todo } from '../types/types';
 import dayjs from 'dayjs';
 
@@ -23,102 +28,109 @@ const initialTodos: Todo[] = [
 ];
 
 export const useTodoStore = create(
-  devtools(
-    combine(
-      {
-        todos: initialTodos,
-        selectedDate: dayjs().format('YYYY-MM-DD'),
-        currentFocusTodoId: null as string | null,
-      },
-
-      (set) => ({
-        addTodo: (text: string, date: string) => {
-          const newTodo: Todo = {
-            id: crypto.randomUUID(),
-            text,
-            date,
-            createdAt: Date.now(),
-            status: 'active',
-            totalFocusTime: 0,
-          };
-
-          set(
-            (state) => ({
-              todos: [newTodo, ...state.todos],
-            }),
-            false,
-            'todo/add',
-          );
+  persist(
+    devtools(
+      combine(
+        {
+          todos: initialTodos,
+          selectedDate: dayjs().format('YYYY-MM-DD'),
+          currentFocusTodoId: null as string | null,
         },
 
-        updateTodo: (id: string, updates: Partial<Todo>) => {
-          set(
-            (state) => ({
-              todos: state.todos.map((todo) =>
-                todo.id === id ? { ...todo, ...updates } : todo,
-              ),
-            }),
-            false,
-            'todo/update',
-          );
-        },
+        (set) => ({
+          addTodo: (text: string, date: string) => {
+            const newTodo: Todo = {
+              id: crypto.randomUUID(),
+              text,
+              date,
+              createdAt: Date.now(),
+              status: 'active',
+              totalFocusTime: 0,
+            };
 
-        deleteTodo: (id: string) => {
-          set(
-            (state) => ({
-              todos: state.todos.filter((todo) => todo.id !== id),
-            }),
-            false,
-            'todo/delete',
-          );
-        },
+            set(
+              (state) => ({
+                todos: [newTodo, ...state.todos],
+              }),
+              false,
+              'todo/add',
+            );
+          },
 
-        toggleTodo: (id: string) => {
-          set(
-            (state) => ({
-              todos: state.todos.map((todo) =>
-                todo.id === id
-                  ? {
-                      ...todo,
-                      status: todo.status === 'active' ? 'completed' : 'active',
-                    }
-                  : todo,
-              ),
-            }),
-            false,
-            'todo/toggle',
-          );
-        },
+          updateTodo: (id: string, updates: Partial<Todo>) => {
+            set(
+              (state) => ({
+                todos: state.todos.map((todo) =>
+                  todo.id === id ? { ...todo, ...updates } : todo,
+                ),
+              }),
+              false,
+              'todo/update',
+            );
+          },
 
-        setSelectedDate: (date: string) => set({ selectedDate: date }),
+          deleteTodo: (id: string) => {
+            set(
+              (state) => ({
+                todos: state.todos.filter((todo) => todo.id !== id),
+              }),
+              false,
+              'todo/delete',
+            );
+          },
 
-        startFocus: (id: string) => {
-          set({ currentFocusTodoId: id }, false, 'todo/startFocus');
-        },
+          toggleTodo: (id: string) => {
+            set(
+              (state) => ({
+                todos: state.todos.map((todo) =>
+                  todo.id === id
+                    ? {
+                        ...todo,
+                        status:
+                          todo.status === 'active' ? 'completed' : 'active',
+                      }
+                    : todo,
+                ),
+              }),
+              false,
+              'todo/toggle',
+            );
+          },
 
-        stopFocus: () => {
-          set({ currentFocusTodoId: null }, false, 'todo/stopFocus');
-        },
+          setSelectedDate: (date: string) => set({ selectedDate: date }),
 
-        addFocusTime: (id: string, seconds: number) => {
-          set(
-            (state) => ({
-              todos: state.todos.map((todo) =>
-                todo.id === id
-                  ? {
-                      ...todo,
-                      totalFocusTime: (todo.totalFocusTime || 0) + seconds,
-                    }
-                  : todo,
-              ),
-            }),
-            false,
-            'todo/addFocusTime',
-          );
-        },
-      }),
+          startFocus: (id: string) => {
+            set({ currentFocusTodoId: id }, false, 'todo/startFocus');
+          },
+
+          stopFocus: () => {
+            set({ currentFocusTodoId: null }, false, 'todo/stopFocus');
+          },
+
+          addFocusTime: (id: string, seconds: number) => {
+            set(
+              (state) => ({
+                todos: state.todos.map((todo) =>
+                  todo.id === id
+                    ? {
+                        ...todo,
+                        totalFocusTime: (todo.totalFocusTime || 0) + seconds,
+                      }
+                    : todo,
+                ),
+              }),
+              false,
+              'todo/addFocusTime',
+            );
+          },
+        }),
+      ),
+      { name: 'TodoStore' },
     ),
-    { name: 'TodoStore' },
+    {
+      name: 'todo-storage',
+      storage: createJSONStorage(() => localStorage),
+    },
   ),
 );
 
