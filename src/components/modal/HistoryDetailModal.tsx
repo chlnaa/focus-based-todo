@@ -1,11 +1,14 @@
-import { useParams } from 'react-router';
 import { useTodo } from '@/stores/useTodoStore';
-import MiniDashboard from '../dashboard/MiniDashboard';
-import HistoryTodoRow from './HistoryTodoRow';
+import MiniDashboard from '../../features/dashboard/MiniDashboard';
+import HistoryTodoRow from '../../features/history/HistoryTodoRow';
 import { useDayDashboard } from '@/hooks/useDayDashboard';
+import { DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 
-export default function HistoryDetail() {
-  const { date } = useParams<{ date: string }>();
+interface HistoryDetailModalProps {
+  date: string;
+}
+
+export default function HistoryDetailModal({ date }: HistoryDetailModalProps) {
   const todos = useTodo();
 
   const {
@@ -17,11 +20,10 @@ export default function HistoryDetail() {
   } = useDayDashboard(todos, date!);
 
   return (
-    <div className="mt-5 border-2 rounded-4xl p-3">
-      <div className="flex items-center gap-5 px-5 text-2xl">
-        <div>{date}</div>
-        <h1>Focus Daily Log</h1>
-      </div>
+    <DialogContent className="border-2 rounded-4xl py-5 px-3">
+      <DialogHeader className="flex items-center gap-5 px-5 text-2xl">
+        <DialogTitle className="p-5">{date}</DialogTitle>
+      </DialogHeader>
       <MiniDashboard
         formattedFocusTime={formattedFocusTime}
         completionRate={completionRate}
@@ -33,6 +35,6 @@ export default function HistoryDetail() {
           <HistoryTodoRow key={todo.id} todo={todo} />
         ))}
       </ul>
-    </div>
+    </DialogContent>
   );
 }
