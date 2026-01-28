@@ -7,6 +7,7 @@ import { Pencil, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useNavigate } from 'react-router';
+import { AlertModal } from '@/components/modal/AlertModal';
 
 interface TodoItemProps {
   todo: Todo;
@@ -23,8 +24,14 @@ export default function TodoItems({ todo, onDelete, onUpdate }: TodoItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState(text);
 
+  const [showModal, setShowModal] = useState(false);
+  const openDeleteModal = () => setShowModal(true);
+  const confirmDelete = () => {
+    onDelete(id);
+    setShowModal(false);
+  };
+
   const handleToggle = () => toggleTodoStatus(id);
-  const handleDelete = () => onDelete(id);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -88,13 +95,20 @@ export default function TodoItems({ todo, onDelete, onUpdate }: TodoItemProps) {
           >
             <Pencil />
           </Button>
+
           <Button
             variant={'ghost'}
-            onClick={handleDelete}
+            onClick={openDeleteModal}
             disabled={todo.status === 'completed'}
           >
             <Trash2 />
           </Button>
+
+          <AlertModal
+            open={showModal}
+            onOpenChange={setShowModal}
+            onConfirm={confirmDelete}
+          />
         </div>
       </div>
       <div className="flex justify-end items-center w-full">
