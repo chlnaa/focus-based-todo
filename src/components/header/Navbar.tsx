@@ -1,5 +1,6 @@
-import { AlarmClockCheck, Sun, Menu } from 'lucide-react';
+import { AlarmClockCheck, Sun } from 'lucide-react';
 import { Link } from 'react-router';
+import MenuButton from './MenuButton';
 
 export default function Navbar() {
   return (
@@ -12,9 +13,7 @@ export default function Navbar() {
       </Link>
       <div className="flex items-center gap-5">
         <Sun />
-        <Link to={'/history'}>
-          <Menu />
-        </Link>
+        <MenuButton />
       </div>
     </nav>
   );
