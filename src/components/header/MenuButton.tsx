@@ -16,7 +16,7 @@ export default function MenuButton() {
         <PopoverClose asChild>
           <Link to={'/history'}>
             <div className="hover:bg-muted cursor-pointer px-4 py-3 text-sm">
-              Focus Log
+              Focus History
             </div>
           </Link>
         </PopoverClose>
