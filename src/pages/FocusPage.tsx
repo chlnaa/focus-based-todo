@@ -1,15 +1,17 @@
+import { FocusStopModal } from '@/components/modal/FocusStopModal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { formatTime } from '@/lib/utils';
 import { useAddFocusTime, useTodo } from '@/stores/useTodoStore';
 import { Play, Square, MoveLeft, Pause } from 'lucide-react';
 import { useState } from 'react';
-import { Link, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { useInterval } from 'usehooks-ts';
 
 type TimerStatus = 'idle' | 'running' | 'paused' | 'completed';
 
 export default function FocusPage() {
+  const navigate = useNavigate();
   const { todoId } = useParams<{ todoId: string }>();
 
   const todos = useTodo();
@@ -20,6 +22,7 @@ export default function FocusPage() {
   const [timeLeft, setTimeLeft] = useState(1500);
   const [initialTime, setInitialTime] = useState(1500);
 
+  const [isStopModalOpen, setIsStopModalOpen] = useState(false);
   const [isCustomInputOpen, setIsCustomInputOpen] = useState(false);
   const [customMinutes, setCustomMinutes] = useState('');
 
@@ -41,10 +44,14 @@ export default function FocusPage() {
     }
   };
 
-  const handleStopClick = () => {
+  const handleStopClick = () => setIsStopModalOpen(true);
+
+  const handleConfirmStop = () => {
     handleTimerComplete();
     setStatus('idle');
     setTimeLeft(initialTime);
+    setIsStopModalOpen(false);
+    navigate('/');
   };
 
   useInterval(
@@ -56,7 +63,7 @@ export default function FocusPage() {
         handleTimerComplete();
       }
     },
-    status === 'running' ? 1000 : null,
+    status === 'running' && !isStopModalOpen ? 1000 : null,
   );
 
   const handleTimerComplete = () => {
@@ -73,11 +80,14 @@ export default function FocusPage() {
   return (
     <div className="flex flex-col justify-center items-center w-full max-w-175 mt-5 m-auto ">
       <header className="relative w-full text-center">
-        <Link to={'/'} onClick={handleStopClick}>
-          <Button className="absolute left-3 top-1" variant={'ghost'}>
-            <MoveLeft />
-          </Button>
-        </Link>
+        <Button
+          className="absolute left-3 top-1"
+          variant={'ghost'}
+          onClick={handleStopClick}
+        >
+          <MoveLeft />
+        </Button>
+
         <h1 className="text-3xl font-bold">Deep Focus</h1>
       </header>
       <main className="flex flex-col items-center justify-center gap-5 ">
@@ -143,6 +153,12 @@ export default function FocusPage() {
           >
             <Square />
           </Button>
+
+          <FocusStopModal
+            open={isStopModalOpen}
+            onOpenChange={setIsStopModalOpen}
+            onConfirm={handleConfirmStop}
+          />
         </div>
       </main>
       <footer className="flex flex-col items-center justify-start my-4 gap-8">

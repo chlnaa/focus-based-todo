@@ -4,7 +4,7 @@ import { useTodo } from '@/stores/useTodoStore';
 import type { Todo } from '@/types/types';
 import { useMemo } from 'react';
 
-export default function HistoryPage() {
+export default function FocusHistoryPage() {
   const historyTodos = useTodo();
 
   const todosByDate = useMemo(
@@ -19,7 +19,7 @@ export default function HistoryPage() {
 
   return (
     <div>
-      <h1 className="text-center text-3xl py-4">Focus Log</h1>
+      <h1 className="text-center text-3xl font-semibold py-4">Focus History</h1>
       {sortedDates.map((date) => (
         <DayHistoryCard
           key={date}
