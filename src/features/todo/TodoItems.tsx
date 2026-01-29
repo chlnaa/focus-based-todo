@@ -4,10 +4,11 @@ import { cn, formatTime } from '@/lib/utils';
 import { useToggleTodo } from '@/stores/useTodoStore';
 import type { Todo } from '@/types/types';
 import { Pencil, Trash2 } from 'lucide-react';
-import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useNavigate } from 'react-router';
 import { AlertModal } from '@/components/modal/AlertModal';
+import TodoTextEditor from '@/components/common/TodoTextEditor';
+import { useTodoEdit } from '@/hooks/useTodoEdit';
 
 interface TodoItemProps {
   todo: Todo;
@@ -18,11 +19,7 @@ interface TodoItemProps {
 export default function TodoItems({ todo, onDelete, onUpdate }: TodoItemProps) {
   const navigate = useNavigate();
 
-  const { id, text, status, totalFocusTime } = todo;
-  const toggleTodoStatus = useToggleTodo();
-
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedText, setEditedText] = useState(text);
+  const { id, status, totalFocusTime } = todo;
 
   const [showModal, setShowModal] = useState(false);
   const openDeleteModal = () => setShowModal(true);
@@ -31,25 +28,17 @@ export default function TodoItems({ todo, onDelete, onUpdate }: TodoItemProps) {
     setShowModal(false);
   };
 
+  const toggleTodoStatus = useToggleTodo();
   const handleToggle = () => toggleTodoStatus(id);
 
-  const handleEditClick = () => {
-    setIsEditing(true);
-    setEditedText(text);
-  };
-  const handleEditSubmit = () => {
-    if (!editedText.trim()) {
-      setIsEditing(false);
-      return;
-    }
-    onUpdate(id, { text: editedText.trim() });
-    setIsEditing(false);
-  };
-
-  const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
-    if (e.key === 'Enter') handleEditSubmit();
-    if (e.key === 'Escape') setIsEditing(false);
-  };
+  const {
+    isEditing,
+    editedText,
+    setEditedText,
+    handleEditClick,
+    handleEditSubmit,
+    handleKeyDown,
+  } = useTodoEdit(todo, onUpdate);
 
   return (
     <li
@@ -65,27 +54,14 @@ export default function TodoItems({ todo, onDelete, onUpdate }: TodoItemProps) {
             checked={status === 'completed'}
             onCheckedChange={handleToggle}
           />
-          {isEditing ? (
-            <Input
-              className="p-2"
-              value={editedText}
-              onChange={(e) => setEditedText(e.target.value)}
-              onKeyDown={handleKeyDown}
-              onBlur={handleEditSubmit}
-              autoFocus
-            />
-          ) : (
-            <label
-              className={cn(
-                'p-2 text-xl',
-                todo.status === 'completed' &&
-                  'line-through text-muted-foreground',
-              )}
-              id={id}
-            >
-              {text}
-            </label>
-          )}
+          <TodoTextEditor
+            todo={todo}
+            isEditing={isEditing}
+            editedText={editedText}
+            setEditedText={setEditedText}
+            handleKeyDown={handleKeyDown}
+            handleEditSubmit={handleEditSubmit}
+          />
         </div>
         <div>
           <Button
