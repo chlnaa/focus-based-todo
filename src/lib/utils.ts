@@ -1,5 +1,6 @@
 import type { Todo } from '@/types/types';
 import { clsx, type ClassValue } from 'clsx';
+import dayjs from 'dayjs';
 import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
@@ -43,4 +44,8 @@ export const getDayStats = (dayTodos: Todo[]) => {
     completionRate,
     completedCount,
   };
+};
+
+export const isToday = (date: string | Date | number): boolean => {
+  return dayjs(date).isSame(dayjs(), 'day');
 };

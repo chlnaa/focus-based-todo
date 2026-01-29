@@ -18,7 +18,7 @@ export default function TodoList({ filteredTodos }: { filteredTodos: Todo[] }) {
 
   return (
     <section>
-      <AddTodo onAdd={handleAdd} />
+      <AddTodo selectedDate={selectedDate} onAdd={handleAdd} />
       <ul className="mt-3 ">
         {filteredTodos.map((todo) => (
           <TodoItems

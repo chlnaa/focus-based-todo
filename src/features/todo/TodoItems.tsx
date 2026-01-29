@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { cn, formatTime } from '@/lib/utils';
+import { cn, formatTime, isToday } from '@/lib/utils';
 import { useToggleTodo } from '@/stores/useTodoStore';
 import type { Todo } from '@/types/types';
 import { Pencil, Trash2 } from 'lucide-react';
@@ -19,7 +19,9 @@ interface TodoItemProps {
 export default function TodoItems({ todo, onDelete, onUpdate }: TodoItemProps) {
   const navigate = useNavigate();
 
-  const { id, status, totalFocusTime } = todo;
+  const { id, status, totalFocusTime, date } = todo;
+
+  const isReadOnly = !isToday(date);
 
   const [showModal, setShowModal] = useState(false);
   const openDeleteModal = () => setShowModal(true);
@@ -46,6 +48,7 @@ export default function TodoItems({ todo, onDelete, onUpdate }: TodoItemProps) {
       className={cn(
         'flex flex-col justify-between items-center p-2 border-2 rounded-xl gap-4 mb-5',
         todo.status === 'completed' && 'opacity-60 grayscale[0.5]',
+        isReadOnly && 'text-muted-foreground',
       )}
     >
       <div className="flex justify-between items-center w-full">
@@ -53,6 +56,7 @@ export default function TodoItems({ todo, onDelete, onUpdate }: TodoItemProps) {
           <Checkbox
             checked={status === 'completed'}
             onCheckedChange={handleToggle}
+            disabled={isReadOnly}
           />
           <TodoTextEditor
             todo={todo}
@@ -67,7 +71,7 @@ export default function TodoItems({ todo, onDelete, onUpdate }: TodoItemProps) {
           <Button
             variant={'ghost'}
             onClick={handleEditClick}
-            disabled={todo.status === 'completed'}
+            disabled={todo.status === 'completed' || isReadOnly}
           >
             <Pencil />
           </Button>
@@ -75,7 +79,7 @@ export default function TodoItems({ todo, onDelete, onUpdate }: TodoItemProps) {
           <Button
             variant={'ghost'}
             onClick={openDeleteModal}
-            disabled={todo.status === 'completed'}
+            disabled={todo.status === 'completed' || isReadOnly}
           >
             <Trash2 />
           </Button>
@@ -93,7 +97,7 @@ export default function TodoItems({ todo, onDelete, onUpdate }: TodoItemProps) {
         </div>
         <Button
           onClick={() => navigate(`/focus/${id}`)}
-          disabled={todo.status === 'completed'}
+          disabled={todo.status === 'completed' || isReadOnly}
         >
           startFocus
         </Button>
