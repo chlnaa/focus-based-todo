@@ -1,4 +1,6 @@
+import { prepareChartData } from '@/features/history/chart-utils';
 import DayHistoryCard from '@/features/history/DayHistoryCard';
+import FocusTrendChart from '@/features/history/FocusTrendChart';
 import { getDayStats } from '@/lib/utils';
 import { useTodo } from '@/stores/useTodoStore';
 import type { Todo } from '@/types/types';
@@ -17,9 +19,13 @@ export default function FocusHistoryPage() {
     [todosByDate],
   );
 
+  const chartData = useMemo(() => prepareChartData(todosByDate), [todosByDate]);
+
   return (
-    <div>
-      <h1 className="text-center text-3xl font-semibold py-4">Focus History</h1>
+    <div className="flex flex-col gap-3">
+      <h1 className="text-center text-3xl font-semibold">Focus History</h1>
+      <FocusTrendChart data={chartData} />
+
       {sortedDates.map((date) => (
         <DayHistoryCard
           key={date}
