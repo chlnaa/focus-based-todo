@@ -1,4 +1,8 @@
-import { useSelectedDate, useTodo } from '@/stores/useTodoStore';
+import {
+  useSelectedDate,
+  useSetSelectedDate,
+  useTodo,
+} from '@/stores/useTodoStore';
 import WeeklyCalendar from '@/features/date/WeeklyCalendar';
 import MiniDashboard from '@/features/dashboard/MiniDashboard';
 import TodoList from '@/features/todo/TodoList';
@@ -8,6 +12,7 @@ export default function TodayPage() {
   const todos = useTodo();
 
   const selectedDate = useSelectedDate();
+  const setSelectedDate = useSetSelectedDate();
 
   const {
     todosData,
@@ -19,7 +24,10 @@ export default function TodayPage() {
 
   return (
     <div className="flex flex-col">
-      <WeeklyCalendar />
+      <WeeklyCalendar
+        selectedDate={selectedDate}
+        onDateSelect={setSelectedDate}
+      />
       <MiniDashboard
         formattedFocusTime={formattedFocusTime}
         completionRate={completionRate}
