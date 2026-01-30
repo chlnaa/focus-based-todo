@@ -1,13 +1,21 @@
 import { prepareChartData } from '@/features/history/chart-utils';
 import DayHistoryCard from '@/features/history/DayHistoryCard';
+import FocusHistoryHeader from '@/features/history/FocusHistoryHeader';
+import FocusTimeBarChart from '@/features/history/FocusTimeBarChart';
 import FocusTrendChart from '@/features/history/FocusTrendChart';
+import { useWeekNavigation } from '@/hooks/useWeekNavigation';
 import { getDayStats } from '@/lib/utils';
-import { useTodo } from '@/stores/useTodoStore';
+import { useSelectedDate, useTodo } from '@/stores/useTodoStore';
 import type { Todo } from '@/types/types';
+import dayjs from 'dayjs';
 import { useMemo } from 'react';
 
 export default function FocusHistoryPage() {
   const historyTodos = useTodo();
+  const selectedDate = useSelectedDate();
+
+  const { baseDate, goPrevWeek, goNextWeek, currentMonth } =
+    useWeekNavigation(selectedDate);
 
   const todosByDate = useMemo(
     () => groupTodosByDate(historyTodos),
@@ -21,10 +29,38 @@ export default function FocusHistoryPage() {
 
   const chartData = useMemo(() => prepareChartData(todosByDate), [todosByDate]);
 
+  const weeklyData = useMemo(() => {
+    const start = baseDate.startOf('day');
+    const end = baseDate.endOf('week').endOf('day');
+
+    return chartData.filter((d) => {
+      const targetDate = dayjs(d.date);
+      return (
+        (targetDate.isSame(start) || targetDate.isAfter(start)) &&
+        (targetDate.isSame(end) || targetDate.isBefore(end))
+      );
+    });
+  }, [chartData, baseDate]);
+
+  const isNextDisabled = baseDate.isSame(dayjs().startOf('week'), 'day');
+
   return (
     <div className="flex flex-col gap-3">
       <h1 className="text-center text-3xl font-semibold">Focus History</h1>
-      <FocusTrendChart data={chartData} />
+
+      <div className="flex flex-col items-center justify-center gap-6 bg-muted/30 p-3rounded-xl">
+        <FocusHistoryHeader
+          currentMonth={currentMonth}
+          dateRange={`${baseDate.format('YYYY-MM-DD')} ~ ${baseDate.endOf('week').format('MM-DD')}`}
+          isNextDisabled={isNextDisabled}
+          onPrev={goPrevWeek}
+          onNext={goNextWeek}
+        />
+        <div className="flex items-center gap-5">
+          <FocusTrendChart data={weeklyData} baseDate={baseDate} />
+          <FocusTimeBarChart data={weeklyData} baseDate={baseDate} />
+        </div>
+      </div>
 
       {sortedDates.map((date) => (
         <DayHistoryCard
