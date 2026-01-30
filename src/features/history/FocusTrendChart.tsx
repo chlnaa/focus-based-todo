@@ -1,14 +1,20 @@
 import type { ChartData } from '@/types/types';
 import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
+import type dayjs from 'dayjs';
 
-export default function FocusTrendChart({ data }: { data: ChartData[] }) {
+interface TrendChartProps {
+  data: ChartData[];
+  baseDate: dayjs.Dayjs;
+}
+
+export default function FocusTrendChart({ data, baseDate }: TrendChartProps) {
   const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
-    if (!svgRef.current || data.length === 0) return;
+    if (!svgRef.current) return;
 
-    const margin = { top: 10, right: 10, bottom: 20, left: 35 };
+    const margin = { top: 10, right: 10, bottom: 20, left: 40 };
     const width = 250 - margin.left - margin.right;
     const height = 150 - margin.top - margin.bottom;
 
@@ -25,19 +31,27 @@ export default function FocusTrendChart({ data }: { data: ChartData[] }) {
 
     const x = d3
       .scaleTime()
-      .domain(d3.extent(data, (d) => d.date) as [Date, Date])
+      .domain([
+        baseDate.startOf('week').toDate(),
+        baseDate.endOf('week').startOf('day').toDate(),
+      ])
       .range([0, width]);
 
     const y = d3.scaleLinear().domain([0, 100]).range([height, 0]);
+
+    const weekDays = Array.from({ length: 7 }, (_, i) =>
+      baseDate.add(i, 'day').startOf('day').toDate(),
+    );
 
     svg
       .append('g')
       .attr('transform', `translate(0, ${height})`)
       .call(
         d3
-          .axisBottom(x)
-          .ticks(5)
-          .tickFormat(d3.timeFormat('%m/%d') as any),
+          .axisBottom<Date>(x)
+          .tickValues(weekDays)
+          .tickFormat(d3.timeFormat('%m/%d'))
+          .tickSizeOuter(0),
       )
       .selectAll('text')
       .style('font-size', '9px')
@@ -47,33 +61,46 @@ export default function FocusTrendChart({ data }: { data: ChartData[] }) {
       .append('g') //
       .call(
         d3
-          .axisLeft(y)
+          .axisLeft<number>(y)
           .ticks(5)
-          .tickFormat((d) => `${d}%`),
+          .tickFormat((d) => `${d}%`)
+          .tickSizeOuter(0),
       )
       .selectAll('text')
       .style('font-size', '9px')
       .attr('dx', '-2px');
 
-    const line = d3
-      .line<ChartData>()
-      .x((d) => x(d.date))
-      .y((d) => y(d.completionRate))
-      .curve(d3.curveMonotoneX);
+    if (data.length > 0) {
+      const line = d3
+        .line<ChartData>()
+        .x((d) => x(new Date(d.date)))
+        .y((d) => y(d.completionRate))
+        .curve(d3.curveMonotoneX);
 
-    svg
-      .append('path')
-      .datum(data)
-      .attr('fill', 'none')
-      .attr('stroke', '#10b981')
-      .attr('stroke-width', 2)
-      .attr('d', line);
-  }, [data]);
+      svg
+        .append('path')
+        .datum(data)
+        .attr('fill', 'none')
+        .attr('stroke', '#10b981')
+        .attr('stroke-width', 2)
+        .attr('d', line);
+
+      svg
+        .selectAll('.dot')
+        .data(data)
+        .enter()
+        .append('circle')
+        .attr('cx', (d) => x(new Date(d.date)))
+        .attr('cy', (d) => y(d.completionRate))
+        .attr('r', 3)
+        .attr('fill', '#10b981');
+    }
+  }, [data, baseDate]);
 
   return (
     <div className="w-fit max-w-[300] bg-card rounded-2xl border-2 p-4 my-4 shadow-sm">
       <h3 className="text-lg font-bold text-center mb-4 ml-2">
-        📊 Monthly Completion Trend
+        📊 Weekly Completion Trend
       </h3>
       <svg ref={svgRef} className="w-full h-auto" />
     </div>
