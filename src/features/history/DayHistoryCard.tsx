@@ -18,7 +18,7 @@ export default function DayHistoryCard({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <section className="flex flex-col gap-3 border-2 rounded-2xl p-5 mb-5 cursor-pointer ">
+        <section className="flex flex-col border-2 rounded-2xl p-5 cursor-pointer ">
           <header className="flex justify-between items-center text-lg">
             <div className="flex items-baseline gap-1.5">
               <span className="text-xl font-bold font-mono">{date}</span>
