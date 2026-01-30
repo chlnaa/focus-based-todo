@@ -15,3 +15,9 @@ export interface Todo {
   /** Total focus duration in seconds */
   totalFocusTime: number;
 }
+
+export interface ChartData {
+  date: Date;
+  completionRate: number;
+  totalMinutes: number;
+}
