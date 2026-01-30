@@ -1,19 +1,21 @@
-import { useSelectedDate, useSetSelectedDate } from '@/stores/useTodoStore';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
 import dayjs from 'dayjs';
+import { useWeekNavigation } from '@/hooks/useWeekNavigation';
 
-export default function WeeklyCalendar() {
-  const setSelectedDate = useSetSelectedDate();
-  const selectedDate = useSelectedDate();
+interface WeeklyCalendarProps {
+  selectedDate: string;
+  onDateSelect: (date: string) => void;
+}
 
-  const [viewDate, setViewDate] = useState(dayjs(selectedDate));
-
-  const currentMonth = viewDate.format('MMM');
-  const startOfWeek = viewDate.startOf('week');
+export default function WeeklyCalendar({
+  selectedDate,
+  onDateSelect,
+}: WeeklyCalendarProps) {
+  const { baseDate, goPrevWeek, goNextWeek, goToday, currentMonth } =
+    useWeekNavigation(selectedDate || dayjs(), true);
 
   const daysInWeek = Array.from({ length: 7 }, (_, i) => {
-    const date = startOfWeek.add(i, 'day');
+    const date = baseDate.add(i, 'day');
     const fullDate = date.format('YYYY-MM-DD');
     return {
       dayName: date.format('ddd'),
@@ -25,15 +27,9 @@ export default function WeeklyCalendar() {
   });
 
   const handleGoToday = () => {
-    const today = dayjs();
-    setViewDate(today);
-    setSelectedDate(today.format('YYYY-MM-DD'));
+    goToday();
+    onDateSelect(dayjs().format('YYYY-MM-DD'));
   };
-
-  const handleGoPrevWeek = () =>
-    setViewDate((prev) => prev.subtract(1, 'week'));
-
-  const handleGoNextWeek = () => setViewDate((prev) => prev.add(1, 'week'));
 
   return (
     <section>
@@ -50,14 +46,14 @@ export default function WeeklyCalendar() {
           <Button
             className="cursor-pointer text-xl ml-2"
             variant={'ghost'}
-            onClick={handleGoPrevWeek}
+            onClick={goPrevWeek}
           >
             {'<'}
           </Button>
           <Button
             className="cursor-pointer text-xl"
             variant={'ghost'}
-            onClick={handleGoNextWeek}
+            onClick={goNextWeek}
           >
             {'>'}
           </Button>
@@ -72,7 +68,7 @@ export default function WeeklyCalendar() {
             <Button
               className={`text-xl transition-all ${day.isSelected ? 'p-4 text-2xl' : 'text-gray-600'}`}
               variant={day.isSelected ? 'default' : 'ghost'}
-              onClick={() => setSelectedDate(day.fullDate)}
+              onClick={() => onDateSelect(day.fullDate)}
             >
               {day.dateNumber}
             </Button>

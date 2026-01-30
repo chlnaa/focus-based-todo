@@ -14,8 +14,10 @@ export default function FocusHistoryPage() {
   const historyTodos = useTodo();
   const selectedDate = useSelectedDate();
 
-  const { baseDate, goPrevWeek, goNextWeek, currentMonth } =
-    useWeekNavigation(selectedDate);
+  const { baseDate, goPrevWeek, goNextWeek, currentMonth } = useWeekNavigation(
+    selectedDate,
+    false,
+  );
 
   const todosByDate = useMemo(
     () => groupTodosByDate(historyTodos),
