@@ -1,8 +1,9 @@
 import { FocusStopModal } from '@/components/modal/FocusStopModal';
+import TimerCompletionModal from '@/components/modal/TimerCompletionModal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { formatTime } from '@/lib/utils';
-import { useAddFocusTime, useTodo } from '@/stores/useTodoStore';
+import { useAddFocusTime, useTodo, useUpdateTodo } from '@/stores/useTodoStore';
 import { Play, Square, MoveLeft, Pause } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
@@ -17,12 +18,14 @@ export default function FocusPage() {
   const todos = useTodo();
   const currentTodo = todos.find((t) => t.id === todoId);
   const addFocusTime = useAddFocusTime();
+  const updateTodoStatus = useUpdateTodo();
 
   const [status, setStatus] = useState<TimerStatus>('idle');
   const [timeLeft, setTimeLeft] = useState(1500);
   const [initialTime, setInitialTime] = useState(1500);
 
   const [isStopModalOpen, setIsStopModalOpen] = useState(false);
+  const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false);
   const [isCustomInputOpen, setIsCustomInputOpen] = useState(false);
   const [customMinutes, setCustomMinutes] = useState('');
 
@@ -47,31 +50,47 @@ export default function FocusPage() {
   const handleStopClick = () => setIsStopModalOpen(true);
 
   const handleConfirmStop = () => {
-    handleTimerComplete();
-    setStatus('idle');
-    setTimeLeft(initialTime);
+    saveFocusedTime();
     setIsStopModalOpen(false);
+    navigate('/');
+  };
+
+  const handleConfirmCompletion = () => {
+    saveFocusedTime();
+    setIsCompletionModalOpen(false);
     navigate('/');
   };
 
   useInterval(
     () => {
       if (timeLeft > 0) {
-        setTimeLeft((prev) => prev - 1);
-      } else {
-        setStatus('completed');
-        handleTimerComplete();
+        const nextTime = timeLeft - 1;
+        setTimeLeft(nextTime);
+
+        if (nextTime === 0) {
+          setStatus('completed');
+          setIsCompletionModalOpen(true);
+        }
       }
     },
-    status === 'running' && !isStopModalOpen ? 1000 : null,
+
+    status === 'running' && !isStopModalOpen && !isCompletionModalOpen
+      ? 1000
+      : null,
   );
 
-  const handleTimerComplete = () => {
-    if (!todoId) return;
+  const saveFocusedTime = () => {
+    if (!todoId || !currentTodo) return;
 
     const focusedSeconds = initialTime - timeLeft;
-    if (todoId && currentTodo) {
+
+    if (focusedSeconds > 0) {
       addFocusTime(todoId, focusedSeconds);
+      setTimeLeft(initialTime);
+
+      if (timeLeft === 0 && currentTodo.status !== 'completed') {
+        updateTodoStatus(todoId, { status: 'completed' });
+      }
     }
   };
 
@@ -171,6 +190,20 @@ export default function FocusPage() {
           <div>{formatTime(currentTodo.totalFocusTime).fullTimeDisplay}</div>
         </div>
       </footer>
+
+      <FocusStopModal
+        open={isStopModalOpen}
+        onOpenChange={setIsStopModalOpen}
+        onConfirm={handleConfirmStop}
+      />
+
+      <TimerCompletionModal
+        open={isCompletionModalOpen}
+        onConfirm={handleConfirmCompletion}
+        totalFocusTime={
+          formatTime(currentTodo.totalFocusTime + initialTime).fullTimeDisplay
+        }
+      />
     </div>
   );
 }
