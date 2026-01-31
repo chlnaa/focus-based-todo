@@ -200,7 +200,9 @@ export default function FocusPage() {
       <TimerCompletionModal
         open={isCompletionModalOpen}
         onConfirm={handleConfirmCompletion}
-        totalFocusTime={formatTime(initialTime).fullTimeDisplay}
+        totalFocusTime={
+          formatTime(currentTodo.totalFocusTime + initialTime).fullTimeDisplay
+        }
       />
     </div>
   );
