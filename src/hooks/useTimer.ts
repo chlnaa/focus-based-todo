@@ -25,6 +25,7 @@ export const useTimer = ({ initialSeconds, onComplete }: UseTimerProps) => {
   };
 
   const stop = () => setStatus('paused');
+  const resume = () => setStatus('running');
 
   useInterval(
     () => {
@@ -47,6 +48,7 @@ export const useTimer = ({ initialSeconds, onComplete }: UseTimerProps) => {
     initialTime: currentInitialTime,
     setDuration,
     togglePlay,
+    resume,
     stop,
     setTimeLeft,
   };

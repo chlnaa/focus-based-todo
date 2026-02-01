@@ -23,13 +23,26 @@ export default function FocusPage() {
 
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
 
-  const { status, timeLeft, initialTime, setDuration, togglePlay, stop } =
-    useTimer({
-      initialSeconds: 1500,
-      onComplete: () => setIsCompletionModalOpen(true),
-    });
+  const {
+    status,
+    timeLeft,
+    initialTime,
+    setDuration,
+    togglePlay,
+    stop,
+    resume,
+  } = useTimer({
+    initialSeconds: 1500,
+    onComplete: () => setIsCompletionModalOpen(true),
+  });
 
   const { hours, minutes, seconds } = formatTime(timeLeft);
+
+  const handleStopModalChange = (open: boolean) => {
+    setIsStopModalOpen(open);
+
+    if (!open) resume();
+  };
 
   const handleStopClick = () => {
     stop();
@@ -69,14 +82,15 @@ export default function FocusPage() {
       <main className="flex flex-col items-center justify-center gap-5 ">
         <div className="flex items-center justify-center text-5xl border-2 rounded-full w-85 h-85 font-mono mt-5 ">
           <div className="flex items-baseline">
-            <span>{hours}</span>
-            <span className="text-sm text-muted-foreground">h</span>
-            <span className="text-muted-foreground">:</span>
+            {Number(hours) > 0 && (
+              <>
+                <span>{hours}</span>
+                <span className="text-muted-foreground">:</span>
+              </>
+            )}
             <span>{minutes}</span>
-            <span className="text-sm text-muted-foreground">m</span>
             <span className="text-muted-foreground">:</span>
             <span>{seconds}</span>
-            <span className="text-sm text-muted-foreground">s</span>
           </div>
         </div>
 
@@ -133,7 +147,7 @@ export default function FocusPage() {
 
       <FocusStopModal
         open={isStopModalOpen}
-        onOpenChange={setIsStopModalOpen}
+        onOpenChange={handleStopModalChange}
         onConfirm={handleSaveAndExit}
       />
 
