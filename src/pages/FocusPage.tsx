@@ -83,19 +83,13 @@ export default function FocusPage() {
         <div className="flex gap-3 p-2">
           <Button
             variant={initialTime === 1500 ? 'default' : 'outline'}
-            onClick={() => {
-              setDuration(25);
-              setIsCustomModalOpen(false);
-            }}
+            onClick={() => setDuration(25)}
           >
             00:25
           </Button>
           <Button
             variant={initialTime === 3000 ? 'default' : 'outline'}
-            onClick={() => {
-              setDuration(50);
-              setIsCustomModalOpen(false);
-            }}
+            onClick={() => setDuration(50)}
           >
             00:50
           </Button>
