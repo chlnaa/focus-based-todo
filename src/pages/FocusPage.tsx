@@ -2,14 +2,12 @@ import { FocusStopModal } from '@/components/modal/FocusStopModal';
 import TimerCompletionModal from '@/components/modal/TimerCompletionModal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useTimer } from '@/hooks/useTimer';
 import { formatTime } from '@/lib/utils';
 import { useAddFocusTime, useTodo, useUpdateTodo } from '@/stores/useTodoStore';
 import { Play, Square, MoveLeft, Pause } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { useInterval } from 'usehooks-ts';
-
-type TimerStatus = 'idle' | 'running' | 'paused' | 'completed';
 
 export default function FocusPage() {
   const navigate = useNavigate();
@@ -20,78 +18,38 @@ export default function FocusPage() {
   const addFocusTime = useAddFocusTime();
   const updateTodoStatus = useUpdateTodo();
 
-  const [status, setStatus] = useState<TimerStatus>('idle');
-  const [timeLeft, setTimeLeft] = useState(1500);
-  const [initialTime, setInitialTime] = useState(1500);
-
   const [isStopModalOpen, setIsStopModalOpen] = useState(false);
   const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false);
+
   const [isCustomInputOpen, setIsCustomInputOpen] = useState(false);
   const [customMinutes, setCustomMinutes] = useState('');
 
+  const { status, timeLeft, initialTime, setDuration, togglePlay, stop } =
+    useTimer({
+      initialSeconds: 1500,
+      onComplete: () => setIsCompletionModalOpen(true),
+    });
+
   const { hours, minutes, seconds } = formatTime(timeLeft);
 
-  const handleSetDuration = (minutes: number) => {
-    const seconds = minutes * 60;
-    setStatus('idle');
-    setTimeLeft(seconds);
-    setInitialTime(seconds);
-    setIsCustomInputOpen(false);
+  const handleStopClick = () => {
+    stop();
+    setIsStopModalOpen(true);
   };
 
-  const handlePlayClick = () => {
-    if (status === 'running') {
-      setStatus('paused');
-    } else {
-      setStatus('running');
-    }
-  };
-
-  const handleStopClick = () => setIsStopModalOpen(true);
-
-  const handleConfirmStop = () => {
-    saveFocusedTime();
-    setIsStopModalOpen(false);
-    navigate('/');
-  };
-
-  const handleConfirmCompletion = () => {
-    saveFocusedTime();
-    setIsCompletionModalOpen(false);
-    navigate('/');
-  };
-
-  useInterval(
-    () => {
-      if (timeLeft > 0) {
-        const nextTime = timeLeft - 1;
-        setTimeLeft(nextTime);
-
-        if (nextTime === 0) {
-          setStatus('completed');
-          setIsCompletionModalOpen(true);
-        }
-      }
-    },
-
-    status === 'running' && !isStopModalOpen && !isCompletionModalOpen
-      ? 1000
-      : null,
-  );
-
-  const saveFocusedTime = () => {
+  const handleSaveAndExit = () => {
     if (!todoId || !currentTodo) return;
 
     const focusedSeconds = initialTime - timeLeft;
 
     if (focusedSeconds > 0) {
       addFocusTime(todoId, focusedSeconds);
-      setTimeLeft(initialTime);
 
       if (timeLeft === 0 && currentTodo.status !== 'completed') {
         updateTodoStatus(todoId, { status: 'completed' });
       }
     }
+    navigate('/');
   };
 
   if (!currentTodo) return <div>No todo items found</div>;
@@ -126,13 +84,19 @@ export default function FocusPage() {
         <div className="flex gap-3 p-2">
           <Button
             variant={initialTime === 1500 ? 'default' : 'outline'}
-            onClick={() => handleSetDuration(25)}
+            onClick={() => {
+              setDuration(25);
+              setIsCustomInputOpen(false);
+            }}
           >
             00:25
           </Button>
           <Button
             variant={initialTime === 3000 ? 'default' : 'outline'}
-            onClick={() => handleSetDuration(50)}
+            onClick={() => {
+              setDuration(50);
+              setIsCustomInputOpen(false);
+            }}
           >
             00:50
           </Button>
@@ -154,7 +118,10 @@ export default function FocusPage() {
               />
               <Button
                 size={'sm'}
-                onClick={() => handleSetDuration(Number(customMinutes))}
+                onClick={() => {
+                  setDuration(Number(customMinutes));
+                  setIsCustomInputOpen(false);
+                }}
               >
                 Set
               </Button>
@@ -162,7 +129,7 @@ export default function FocusPage() {
           )}
         </div>
         <div className="flex gap-6 items-center">
-          <Button className="rounded-full w-15 h-15" onClick={handlePlayClick}>
+          <Button className="rounded-full w-15 h-15" onClick={togglePlay}>
             {status === 'running' ? <Pause /> : <Play />}
           </Button>
           <Button
@@ -172,12 +139,6 @@ export default function FocusPage() {
           >
             <Square />
           </Button>
-
-          <FocusStopModal
-            open={isStopModalOpen}
-            onOpenChange={setIsStopModalOpen}
-            onConfirm={handleConfirmStop}
-          />
         </div>
       </main>
       <footer className="flex flex-col items-center justify-start my-4 gap-8">
@@ -194,12 +155,12 @@ export default function FocusPage() {
       <FocusStopModal
         open={isStopModalOpen}
         onOpenChange={setIsStopModalOpen}
-        onConfirm={handleConfirmStop}
+        onConfirm={handleSaveAndExit}
       />
 
       <TimerCompletionModal
         open={isCompletionModalOpen}
-        onConfirm={handleConfirmCompletion}
+        onConfirm={handleSaveAndExit}
         totalFocusTime={
           formatTime(currentTodo.totalFocusTime + initialTime).fullTimeDisplay
         }
