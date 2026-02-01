@@ -17,7 +17,7 @@ export const formatTime = (totalSeconds: number) => {
   const seconds = s.toString().padStart(2, '0');
 
   const fullTimeDisplay =
-    Number(hours) > 0 ? `${hours}h:${minutes}m` : `${minutes}m:${seconds}s`;
+    Number(hours) > 0 ? `${hours}h ${minutes}m` : `${minutes}m ${seconds}s`;
   return { fullTimeDisplay, hours, minutes, seconds };
 };
 
