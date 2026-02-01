@@ -1,7 +1,7 @@
+import CustomDurationModal from '@/components/modal/CustomDurationModal';
 import { FocusStopModal } from '@/components/modal/FocusStopModal';
 import TimerCompletionModal from '@/components/modal/TimerCompletionModal';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useTimer } from '@/hooks/useTimer';
 import { formatTime } from '@/lib/utils';
 import { useAddFocusTime, useTodo, useUpdateTodo } from '@/stores/useTodoStore';
@@ -21,8 +21,7 @@ export default function FocusPage() {
   const [isStopModalOpen, setIsStopModalOpen] = useState(false);
   const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false);
 
-  const [isCustomInputOpen, setIsCustomInputOpen] = useState(false);
-  const [customMinutes, setCustomMinutes] = useState('');
+  const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
 
   const { status, timeLeft, initialTime, setDuration, togglePlay, stop } =
     useTimer({
@@ -86,7 +85,7 @@ export default function FocusPage() {
             variant={initialTime === 1500 ? 'default' : 'outline'}
             onClick={() => {
               setDuration(25);
-              setIsCustomInputOpen(false);
+              setIsCustomModalOpen(false);
             }}
           >
             00:25
@@ -95,39 +94,19 @@ export default function FocusPage() {
             variant={initialTime === 3000 ? 'default' : 'outline'}
             onClick={() => {
               setDuration(50);
-              setIsCustomInputOpen(false);
+              setIsCustomModalOpen(false);
             }}
           >
             00:50
           </Button>
           <Button
             variant={'outline'}
-            onClick={() => setIsCustomInputOpen(!isCustomInputOpen)}
+            onClick={() => setIsCustomModalOpen(true)}
           >
             Custom
           </Button>
-
-          {isCustomInputOpen && (
-            <div className="flex gap-2 items-center animate-in fade-in zoom-in duration-200">
-              <Input
-                className="w-24"
-                type="number"
-                placeholder="Minutes"
-                value={customMinutes}
-                onChange={(e) => setCustomMinutes(e.target.value)}
-              />
-              <Button
-                size={'sm'}
-                onClick={() => {
-                  setDuration(Number(customMinutes));
-                  setIsCustomInputOpen(false);
-                }}
-              >
-                Set
-              </Button>
-            </div>
-          )}
         </div>
+
         <div className="flex gap-6 items-center">
           <Button className="rounded-full w-15 h-15" onClick={togglePlay}>
             {status === 'running' ? <Pause /> : <Play />}
@@ -151,6 +130,12 @@ export default function FocusPage() {
           <div>{formatTime(currentTodo.totalFocusTime).fullTimeDisplay}</div>
         </div>
       </footer>
+
+      <CustomDurationModal
+        open={isCustomModalOpen}
+        onOpenChange={setIsCustomModalOpen}
+        onSetDuration={(mins) => setDuration(mins)}
+      />
 
       <FocusStopModal
         open={isStopModalOpen}
