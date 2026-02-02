@@ -10,7 +10,6 @@ import { useDayDashboard } from '@/hooks/useDayDashboard';
 
 export default function TodayPage() {
   const todos = useTodo();
-
   const selectedDate = useSelectedDate();
   const setSelectedDate = useSetSelectedDate();
 

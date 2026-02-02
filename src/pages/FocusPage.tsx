@@ -20,7 +20,6 @@ export default function FocusPage() {
 
   const [isStopModalOpen, setIsStopModalOpen] = useState(false);
   const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false);
-
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
 
   const {
