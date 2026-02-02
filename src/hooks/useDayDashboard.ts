@@ -2,7 +2,7 @@ import { formatTime, getDayStats } from '@/lib/utils';
 import type { Todo } from '@/types/types';
 import { useMemo } from 'react';
 
-interface DayDashboardData {
+interface DayDashboardProps {
   todosData: Todo[];
   formattedFocusTime: string;
   completionRate: number;
@@ -13,7 +13,7 @@ interface DayDashboardData {
 export const useDayDashboard = (
   todos: Todo[],
   targetDate: string,
-): DayDashboardData => {
+): DayDashboardProps => {
   const todosData = useMemo(
     () => todos.filter((todo) => todo.date === targetDate),
     [todos, targetDate],
@@ -30,6 +30,6 @@ export const useDayDashboard = (
     formattedFocusTime,
     completionRate: stats.completionRate,
     completedCount: stats.completedCount || 0,
-    totalCount: todosData.length,
+    totalCount: stats.totalCount,
   };
 };

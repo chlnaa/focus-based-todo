@@ -1,6 +1,6 @@
 import { prepareChartData } from '@/features/history/chart-utils';
 import DayHistoryCard from '@/features/history/DayHistoryCard';
-import FocusHistoryHeader from '@/features/history/FocusHistoryHeader';
+import DateNavigationHeader from '@/features/history/DateNavigationHeader';
 import FocusTimeBarChart from '@/features/history/FocusTimeBarChart';
 import FocusTrendChart from '@/features/history/FocusTrendChart';
 import { useWeekNavigation } from '@/hooks/useWeekNavigation';
@@ -51,7 +51,7 @@ export default function FocusHistoryPage() {
       <h1 className="text-center text-3xl font-semibold">Focus History</h1>
 
       <div className="flex flex-col items-center justify-center gap-6 bg-muted/30 p-3rounded-xl">
-        <FocusHistoryHeader
+        <DateNavigationHeader
           currentMonth={currentMonth}
           dateRange={`${baseDate.format('YYYY-MM-DD')} ~ ${baseDate.endOf('week').format('MM-DD')}`}
           isNextDisabled={isNextDisabled}
@@ -77,12 +77,9 @@ export default function FocusHistoryPage() {
 }
 
 const groupTodosByDate = (todos: Todo[]): Record<string, Todo[]> =>
-  todos.reduce(
-    (acc, todo) => {
-      const dateKey = todo.date;
-      if (!acc[dateKey]) acc[dateKey] = [];
-      acc[dateKey].push(todo);
-      return acc;
-    },
-    {} as Record<string, Todo[]>,
-  );
+  todos.reduce<Record<string, Todo[]>>((acc, todo) => {
+    const dateKey = todo.date;
+    if (!acc[dateKey]) acc[dateKey] = [];
+    acc[dateKey].push(todo);
+    return acc;
+  }, {});

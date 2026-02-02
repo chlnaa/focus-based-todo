@@ -20,10 +20,8 @@ export const useTimer = ({ initialSeconds, onComplete }: UseTimerProps) => {
     setCurrentInitialTime(seconds);
   };
 
-  const togglePlay = () => {
+  const togglePlay = () =>
     setStatus((prev) => (prev === 'running' ? 'paused' : 'running'));
-  };
-
   const stop = () => setStatus('paused');
   const resume = () => setStatus('running');
 

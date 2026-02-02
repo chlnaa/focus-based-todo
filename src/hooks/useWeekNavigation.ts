@@ -20,9 +20,9 @@ export function useWeekNavigation(
   return {
     viewDate,
     baseDate: viewDate.startOf('week'),
+    currentMonth: viewDate.format('YYYY-MM'),
     goPrevWeek,
     goNextWeek,
     goToday,
-    currentMonth: viewDate.format('YYYY-MM'),
   };
 }
