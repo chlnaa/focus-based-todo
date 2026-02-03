@@ -1,4 +1,3 @@
-import { cn } from '@/lib/utils';
 import { Input } from '../ui/input';
 import type { Todo } from '@/types/types';
 
@@ -19,7 +18,7 @@ export default function TodoTextEditor({
   handleKeyDown,
   handleEditSubmit,
 }: TodoTextEditorProps) {
-  const { id, text, status } = todo;
+  const { id, text } = todo;
 
   return (
     <>
@@ -33,13 +32,7 @@ export default function TodoTextEditor({
           autoFocus
         />
       ) : (
-        <label
-          className={cn(
-            'p-2 text-xl',
-            status === 'completed' && 'line-through text-muted-foreground',
-          )}
-          id={id}
-        >
+        <label className={'p-2 text-xl'} id={id}>
           {text}
         </label>
       )}

@@ -32,11 +32,7 @@ export default function HistoryTodoRow({ todo }: { todo: Todo }) {
 
   return (
     <li key={id} className="flex justify-between items-center px-5 py-2">
-      <div
-        className={cn(
-          status === 'completed' ? 'text-gray-500 line-through' : '',
-        )}
-      >
+      <div className={cn(status === 'completed' ? 'text-gray-500' : '')}>
         <TodoTextEditor
           todo={todo}
           isEditing={isEditing}
