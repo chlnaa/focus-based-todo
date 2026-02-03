@@ -22,7 +22,7 @@ export default function TodayPage() {
   } = useDayDashboard(todos, selectedDate);
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-4">
       <WeeklyCalendar
         selectedDate={selectedDate}
         onDateSelect={setSelectedDate}

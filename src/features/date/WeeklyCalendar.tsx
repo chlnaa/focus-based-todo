@@ -57,12 +57,12 @@ export default function WeeklyCalendar({
         </div>
       </div>
 
-      <ul className="flex justify-between items-center p-3">
+      <ul className="flex justify-between items-center px-2 py-3 sm:p-3">
         {daysInWeek.map((day) => (
           <li key={day.fullDate} className="text-center">
-            <div>{day.dayName}</div>
+            <div className="text-sm sm:text-xl ">{day.dayName}</div>
             <Button
-              className={`text-xl transition-all ${day.isSelected ? 'p-4 text-2xl' : 'text-gray-600'}`}
+              className={`text-lg sm:text-xl transition-all ${day.isSelected ? 'p-3 sm:p-4 text-xl sm:text-2xl' : 'text-gray-600'}`}
               variant={day.isSelected ? 'default' : 'ghost'}
               onClick={() => onDateSelect(day.fullDate)}
             >
