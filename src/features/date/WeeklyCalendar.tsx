@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import dayjs from 'dayjs';
 import { useWeekNavigation } from '@/hooks/useWeekNavigation';
 import DateNavigationHeader from '../history/DateNavigationHeader';
+import TodayClock from './TodayClock';
 
 interface WeeklyCalendarProps {
   selectedDate: string;
@@ -34,21 +35,26 @@ export default function WeeklyCalendar({
 
   return (
     <section>
-      <div className="flex items-center gap-3">
-        <Button
-          className="h-7 p-2 text-xs font-medium border-gray-300"
-          variant="outline"
-          size="sm"
-          onClick={handleGoToday}
-        >
-          Today
-        </Button>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Button
+            className="h-7 p-2 text-xs font-medium border-gray-300"
+            variant="outline"
+            size="sm"
+            onClick={handleGoToday}
+          >
+            Today
+          </Button>
 
-        <DateNavigationHeader
-          currentMonth={currentMonth}
-          onPrev={goPrevWeek}
-          onNext={goNextWeek}
-        />
+          <DateNavigationHeader
+            currentMonth={currentMonth}
+            onPrev={goPrevWeek}
+            onNext={goNextWeek}
+          />
+        </div>
+        <div className="mr-3">
+          <TodayClock />
+        </div>
       </div>
 
       <ul className="flex justify-between items-center p-3">
