@@ -7,12 +7,12 @@ export default function Navbar() {
     <nav className="flex justify-between items-center">
       <Link to={'/'}>
         <div className="flex items-center gap-2">
-          <AlarmClockCheck />
-          <h1 className="text-2xl font-bold">FocusDo</h1>
+          <AlarmClockCheck className="w-5 h-5 sm:w-6 sm:h-6" />
+          <h1 className="text-lg sm:text-2xl font-bold">FocusDo</h1>
         </div>
       </Link>
       <div className="flex items-center gap-5">
-        <Sun />
+        <Sun className="w-5 h-5 sm:w-6 sm:h-6" />
         <MenuButton />
       </div>
     </nav>

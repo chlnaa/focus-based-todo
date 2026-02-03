@@ -21,7 +21,7 @@ export default function HistoryDetailModal({ date }: HistoryDetailModalProps) {
   } = useDayDashboard(todos, date!);
 
   return (
-    <DialogContent className="border-2 rounded-4xl p-10 min-w-175">
+    <DialogContent className="max-w-[90vw] md:max-w-2xl w-full border-2 rounded-4xl p-4 sm:p-8 ">
       <DialogHeader className="mb-6 text-left">
         <DialogTitle className="text-3xl font-extrabold tracking-tight">
           Daily focus log
