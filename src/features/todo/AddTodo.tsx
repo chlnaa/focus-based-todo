@@ -27,7 +27,7 @@ export default function AddTodo({ selectedDate, onAdd }: AddTodoProps) {
       {isNotToday ? (
         <ReadOnlyMessage selectedDate={selectedDate} />
       ) : (
-        <form className="flex items-center gap-2 p-2" onSubmit={handleSubmit}>
+        <form className="flex items-center gap-2" onSubmit={handleSubmit}>
           <Input
             value={text}
             onChange={(e) => setText(e.target.value)}

@@ -15,11 +15,11 @@ export default function MiniDashboard({
 }: MiniDashboardProps) {
   return (
     <section className="flex justify-between items-center select-none w-full gap-4">
-      <div className="flex-1 border-2 px-6 py-3 rounded-2xl">
+      <div className="flex-1 border-2 px-6 py-4 rounded-2xl">
         <h3 className="text-sm font-semibold text-gray-500">
           Total Focus Time
         </h3>
-        <div className="flex items-center gap-2 pt-4">
+        <div className="flex items-center gap-2 pt-2">
           <Clock4 className="w-5 h-5" />
           <span className="text-xl font-bold">
             {formattedFocusTime || '00:00:00'}
