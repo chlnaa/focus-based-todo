@@ -21,18 +21,26 @@ export default function HistoryDetailModal({ date }: HistoryDetailModalProps) {
   } = useDayDashboard(todos, date!);
 
   return (
-    <DialogContent className="border-2 rounded-4xl py-5 px-3">
-      <DialogHeader className="flex items-center gap-5 px-5 text-2xl">
-        <DialogTitle className="p-5 text-2xl">Daily focus log</DialogTitle>
+    <DialogContent className="border-2 rounded-4xl p-10 min-w-175">
+      <DialogHeader className="mb-6 text-left">
+        <DialogTitle className="text-3xl font-extrabold tracking-tight">
+          Daily focus log
+        </DialogTitle>
+        <DialogDescription className="text-xl text-gray-500 mt-2 font-medium">
+          {date}
+        </DialogDescription>
       </DialogHeader>
-      <DialogDescription className="px-5 text-xl">{date}</DialogDescription>
-      <MiniDashboard
-        formattedFocusTime={formattedFocusTime}
-        completionRate={completionRate}
-        completedCount={completedCount}
-        totalCount={totalCount}
-      />
-      <ul>
+
+      <div className="mb-10">
+        <MiniDashboard
+          formattedFocusTime={formattedFocusTime}
+          completionRate={completionRate}
+          completedCount={completedCount}
+          totalCount={totalCount}
+        />
+      </div>
+
+      <ul className="space-y-4">
         {todosData.map((todo) => (
           <HistoryTodoRow key={todo.id} todo={todo} />
         ))}
