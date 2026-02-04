@@ -1,4 +1,4 @@
-import { prepareChartData } from '@/features/history/chart-utils';
+import { prepareChartData } from '@/lib/chart-utils';
 import DayHistoryCard from '@/features/history/DayHistoryCard';
 import DateNavigationHeader from '@/features/history/DateNavigationHeader';
 import FocusTimeBarChart from '@/features/history/FocusTimeBarChart';
