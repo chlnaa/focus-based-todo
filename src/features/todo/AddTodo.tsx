@@ -2,14 +2,15 @@ import ReadOnlyMessage from '@/components/ReadOnlyMessage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { isToday } from '@/lib/utils';
+import { useAddTodo } from '@/stores/useTodoStore';
 import { useState } from 'react';
 
 interface AddTodoProps {
   selectedDate: string;
-  onAdd: (text: string) => void;
 }
 
-export default function AddTodo({ selectedDate, onAdd }: AddTodoProps) {
+export default function AddTodo({ selectedDate }: AddTodoProps) {
+  const addTodo = useAddTodo();
   const isNotToday = !isToday(selectedDate);
 
   const [text, setText] = useState('');
@@ -18,7 +19,7 @@ export default function AddTodo({ selectedDate, onAdd }: AddTodoProps) {
     e.preventDefault();
     if (text.trim().length === 0) return;
 
-    onAdd(text.trim());
+    addTodo(text.trim(), selectedDate);
     setText('');
   };
 
