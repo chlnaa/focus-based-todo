@@ -9,10 +9,21 @@ import { useSelectedDate, useTodo } from '@/stores/useTodoStore';
 import type { Todo } from '@/types/types';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import FocusHistoryLoading from '@/components/skeleton/FocusHistoryLoading';
 
 export default function FocusHistoryPage() {
   const historyTodos = useTodo();
   const selectedDate = useSelectedDate();
+
+  const { isLoading } = useQuery({
+    queryKey: ['focusHistory'],
+    queryFn: async () => {
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      return historyTodos;
+    },
+    staleTime: 0,
+  });
 
   const { baseDate, goPrevWeek, goNextWeek, currentMonth } = useWeekNavigation(
     selectedDate,
@@ -45,6 +56,8 @@ export default function FocusHistoryPage() {
   }, [chartData, baseDate]);
 
   const isNextDisabled = baseDate.isSame(dayjs().startOf('week'), 'day');
+
+  if (isLoading) return <FocusHistoryLoading />;
 
   return (
     <div className="flex flex-col gap-3">
