@@ -44,31 +44,38 @@ export default function FocusTimeBarChart({ data, baseDate }: BarChartProps) {
     const y = d3
       .scaleLinear()
       .domain([0, maxMinutes + 10])
-      .range([height, 0]);
+      .range([height, 0])
+      .nice();
 
     svg
       .append('g')
       .attr('transform', `translate(0, ${height})`)
       .call(
-        d3
+        d3 //
           .axisBottom<Date>(x)
-          .tickFormat(d3.timeFormat('%m/%d'))
+          .tickFormat(d3.timeFormat('%a'))
           .tickSizeOuter(0),
       )
       .selectAll('text')
-      .style('font-size', '9px');
+      .style('font-size', '10px');
 
     svg
       .append('g')
       .call(
         d3
           .axisLeft<number>(y)
-          .ticks(4)
-          .tickFormat((d) => `${d}m`)
+          .ticks(5)
+          .tickFormat((d) => {
+            if (d > 60) {
+              const hours = (d / 60).toFixed(1);
+              return `${hours.replace('.0', '')}h`;
+            }
+            return `${d}m`;
+          })
           .tickSizeOuter(0),
       )
       .selectAll('text')
-      .style('font-size', '9px');
+      .style('font-size', '10px');
 
     if (data.length > 0) {
       svg

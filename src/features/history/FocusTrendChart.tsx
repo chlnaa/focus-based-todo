@@ -37,7 +37,11 @@ export default function FocusTrendChart({ data, baseDate }: TrendChartProps) {
       ])
       .range([0, width]);
 
-    const y = d3.scaleLinear().domain([0, 100]).range([height, 0]);
+    const y = d3 //
+      .scaleLinear()
+      .domain([0, 100])
+      .range([height, 0])
+      .nice();
 
     const weekDays = Array.from({ length: 7 }, (_, i) =>
       baseDate.add(i, 'day').startOf('day').toDate(),
@@ -50,11 +54,11 @@ export default function FocusTrendChart({ data, baseDate }: TrendChartProps) {
         d3
           .axisBottom<Date>(x)
           .tickValues(weekDays)
-          .tickFormat(d3.timeFormat('%m/%d'))
+          .tickFormat(d3.timeFormat('%a'))
           .tickSizeOuter(0),
       )
       .selectAll('text')
-      .style('font-size', '9px')
+      .style('font-size', '10px')
       .attr('dx', '-2px');
 
     svg
@@ -67,7 +71,7 @@ export default function FocusTrendChart({ data, baseDate }: TrendChartProps) {
           .tickSizeOuter(0),
       )
       .selectAll('text')
-      .style('font-size', '9px')
+      .style('font-size', '10px')
       .attr('dx', '-2px');
 
     if (data.length > 0) {
