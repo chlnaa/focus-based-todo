@@ -1,34 +1,25 @@
-import {
-  useAddTodo,
-  useDeleteTodo,
-  useSelectedDate,
-  useUpdateTodo,
-} from '@/stores/useTodoStore';
+import { useDeleteTodo, useUpdateTodo } from '@/stores/useTodoStore';
 import type { Todo } from '@/types/types';
-import AddTodo from './AddTodo';
 import TodoItems from './TodoItems';
 
-export default function TodoList({ filteredTodos }: { filteredTodos: Todo[] }) {
-  const selectedDate = useSelectedDate();
-  const addTodo = useAddTodo();
+interface TodolistProps {
+  filteredTodos: Todo[];
+}
+
+export default function TodoList({ filteredTodos }: TodolistProps) {
   const updateTodo = useUpdateTodo();
   const deleteTodo = useDeleteTodo();
 
-  const handleAdd = (text: string) => addTodo(text, selectedDate);
-
   return (
-    <section>
-      <AddTodo selectedDate={selectedDate} onAdd={handleAdd} />
-      <ul className="mt-3 ">
-        {filteredTodos.map((todo) => (
-          <TodoItems
-            key={todo.id}
-            todo={todo}
-            onDelete={deleteTodo}
-            onUpdate={updateTodo}
-          />
-        ))}
-      </ul>
-    </section>
+    <ul className="mt-3 ">
+      {filteredTodos.map((todo) => (
+        <TodoItems
+          key={todo.id}
+          todo={todo}
+          onDelete={deleteTodo}
+          onUpdate={updateTodo}
+        />
+      ))}
+    </ul>
   );
 }
