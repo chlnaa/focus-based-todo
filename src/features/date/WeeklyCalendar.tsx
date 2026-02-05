@@ -13,8 +13,24 @@ export default function WeeklyCalendar({
   selectedDate,
   onDateSelect,
 }: WeeklyCalendarProps) {
-  const { baseDate, goPrevWeek, goNextWeek, goToday, currentMonth } =
-    useWeekNavigation(selectedDate || dayjs(), true);
+  const {
+    baseDate,
+    currentMonth,
+    getTodayDate,
+    getPrevWeekDate,
+    getNextWeekDate,
+  } = useWeekNavigation({
+    currentDate: selectedDate || dayjs(),
+    allowFuture: true,
+  });
+
+  const goToday = () => onDateSelect(getTodayDate());
+  const goPrevWeek = () => onDateSelect(getPrevWeekDate());
+  const goNextWeek = () => {
+    const next = getNextWeekDate();
+    if (!next) return;
+    onDateSelect(next);
+  };
 
   const daysInWeek = Array.from({ length: 7 }, (_, i) => {
     const date = baseDate.add(i, 'day');
@@ -28,11 +44,6 @@ export default function WeeklyCalendar({
     };
   });
 
-  const handleGoToday = () => {
-    goToday();
-    onDateSelect(dayjs().format('YYYY-MM-DD'));
-  };
-
   return (
     <section>
       <div className="flex items-center justify-between">
@@ -41,7 +52,7 @@ export default function WeeklyCalendar({
             className="h-7 p-2 text-xs font-medium border-gray-300"
             variant="outline"
             size="sm"
-            onClick={handleGoToday}
+            onClick={goToday}
           >
             Today
           </Button>
