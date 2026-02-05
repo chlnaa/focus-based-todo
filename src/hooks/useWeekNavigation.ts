@@ -1,28 +1,29 @@
-import { useState } from 'react';
 import dayjs from 'dayjs';
 
-export function useWeekNavigation(
-  initialDate: string | Date | dayjs.Dayjs,
+interface useWeekNavigationProps {
+  currentDate: string | Date | dayjs.Dayjs;
+  allowFuture?: boolean;
+}
+
+export function useWeekNavigation({
+  currentDate,
   allowFuture = false,
-) {
-  const [viewDate, setViewDate] = useState(dayjs(initialDate));
+}: useWeekNavigationProps) {
+  const date = dayjs(currentDate);
 
-  const goPrevWeek = () => setViewDate((prev) => prev.subtract(1, 'week'));
-
-  const goNextWeek = () => {
-    const next = viewDate.add(1, 'week');
+  const getTodayDate = () => dayjs().format('YYYY-MM-DD');
+  const getPrevWeekDate = () => date.subtract(1, 'week').format('YYYY-MM-DD');
+  const getNextWeekDate = () => {
+    const next = date.add(1, 'week');
     if (!allowFuture && next.isAfter(dayjs(), 'week')) return;
-    setViewDate(next);
+    return next.format('YYYY-MM-DD');
   };
 
-  const goToday = () => setViewDate(dayjs());
-
   return {
-    viewDate,
-    baseDate: viewDate.startOf('week'),
-    currentMonth: viewDate.format('YYYY-MM'),
-    goPrevWeek,
-    goNextWeek,
-    goToday,
+    baseDate: date.startOf('week'),
+    currentMonth: date.format('YYYY-MM'),
+    getTodayDate,
+    getPrevWeekDate,
+    getNextWeekDate,
   };
 }

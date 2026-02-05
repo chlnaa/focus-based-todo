@@ -5,7 +5,11 @@ import FocusTimeBarChart from '@/features/history/FocusTimeBarChart';
 import FocusTrendChart from '@/features/history/FocusTrendChart';
 import { useWeekNavigation } from '@/hooks/useWeekNavigation';
 import { getDayStats } from '@/lib/utils';
-import { useSelectedDate, useTodo } from '@/stores/useTodoStore';
+import {
+  useSelectedDate,
+  useSetSelectedDate,
+  useTodo,
+} from '@/stores/useTodoStore';
 import type { Todo } from '@/types/types';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
@@ -15,6 +19,7 @@ import FocusHistoryLoading from '@/components/skeleton/FocusHistoryLoading';
 export default function FocusHistoryPage() {
   const historyTodos = useTodo();
   const selectedDate = useSelectedDate();
+  const setSelectedDate = useSetSelectedDate();
 
   const { isLoading } = useQuery({
     queryKey: ['focusHistory'],
@@ -25,10 +30,8 @@ export default function FocusHistoryPage() {
     staleTime: 0,
   });
 
-  const { baseDate, goPrevWeek, goNextWeek, currentMonth } = useWeekNavigation(
-    selectedDate,
-    false,
-  );
+  const { baseDate, currentMonth, getPrevWeekDate, getNextWeekDate } =
+    useWeekNavigation({ currentDate: selectedDate, allowFuture: false });
 
   const todosByDate = useMemo(
     () => groupTodosByDate(historyTodos),
@@ -55,7 +58,15 @@ export default function FocusHistoryPage() {
     });
   }, [chartData, baseDate]);
 
-  const isNextDisabled = baseDate.isSame(dayjs().startOf('week'), 'day');
+  const goPrevWeek = () => setSelectedDate(getPrevWeekDate());
+  const goNextWeek = () => {
+    const next = getNextWeekDate();
+    if (!next) return;
+    setSelectedDate(next);
+  };
+
+  const nextWeekDate = getNextWeekDate();
+  const isNextDisabled = !nextWeekDate;
 
   if (isLoading) return <FocusHistoryLoading />;
 
