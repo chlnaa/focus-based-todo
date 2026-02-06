@@ -15,13 +15,14 @@ import dayjs from 'dayjs';
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import FocusHistoryLoading from '@/components/skeleton/FocusHistoryLoading';
+import ErrorState from '@/components/common/ErrorState';
 
 export default function FocusHistoryPage() {
   const historyTodos = useTodo();
   const selectedDate = useSelectedDate();
   const setSelectedDate = useSetSelectedDate();
 
-  const { isLoading } = useQuery({
+  const { isLoading, isError } = useQuery({
     queryKey: ['focusHistory'],
     queryFn: async () => {
       await new Promise((resolve) => setTimeout(resolve, 800));
@@ -69,6 +70,7 @@ export default function FocusHistoryPage() {
   const isNextDisabled = !nextWeekDate;
 
   if (isLoading) return <FocusHistoryLoading />;
+  if (isError) return <ErrorState message="Failed to load today's data." />;
 
   return (
     <div className="flex flex-col gap-3">
