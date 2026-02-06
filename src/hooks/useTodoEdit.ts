@@ -1,10 +1,12 @@
 import type { Todo } from '@/types/types';
 import { useState } from 'react';
 
-export const useTodoEdit = (
-  todo: Todo,
-  onUpdate: (id: string, updates: Partial<Todo>) => void,
-) => {
+interface UseTodoEditProps {
+  todo: Todo;
+  onUpdate: (id: string, updates: Partial<Todo>) => void;
+}
+
+export const useTodoEdit = ({ todo, onUpdate }: UseTodoEditProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState(todo.text);
 

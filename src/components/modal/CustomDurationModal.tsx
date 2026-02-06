@@ -9,6 +9,7 @@ import {
 } from '../ui/dialog';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
+import { DialogDescription } from '@radix-ui/react-dialog';
 
 interface CustomDurationModalProps {
   open: boolean;
@@ -43,6 +44,9 @@ export default function CustomDurationModal({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Set Custom Focus Time</DialogTitle>
+          <DialogDescription>
+            {'Enter focus time in minutes (1-1440)'}
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="flex flex-col gap-2">

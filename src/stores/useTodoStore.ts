@@ -8,24 +8,7 @@ import {
 import type { Todo } from '../types/types';
 import dayjs from 'dayjs';
 
-const initialTodos: Todo[] = [
-  {
-    id: '1',
-    text: 'study to Zustand',
-    date: '2026-01-19',
-    createdAt: Date.now() - 10000,
-    status: 'active',
-    totalFocusTime: 0,
-  },
-  {
-    id: '2',
-    text: 'study to React',
-    date: '2026-01-19',
-    createdAt: Date.now() - 20000,
-    status: 'completed',
-    totalFocusTime: 1800,
-  },
-];
+const initialTodos: Todo[] = [];
 
 export const useTodoStore = create(
   persist(

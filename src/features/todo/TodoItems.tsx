@@ -40,7 +40,7 @@ export default function TodoItems({ todo, onDelete, onUpdate }: TodoItemProps) {
     handleEditClick,
     handleEditSubmit,
     handleKeyDown,
-  } = useTodoEdit(todo, onUpdate);
+  } = useTodoEdit({ todo, onUpdate });
 
   return (
     <li
