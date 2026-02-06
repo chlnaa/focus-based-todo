@@ -12,6 +12,7 @@ import AddTodo from '@/features/todo/AddTodo';
 import MiniDashboardSkeleton from '@/components/skeleton/MiniDashboardSkeleton';
 import { TodoItemSkeleton } from '@/components/skeleton/TodoItemSkeleton';
 import ReadOnlyMessage from '@/components/common/ReadOnlyMessage';
+import EmptyTodo from '@/components/common/EmptyTodo';
 import dayjs from 'dayjs';
 
 type ReadOnlyVariant = 'past' | 'future';
@@ -73,6 +74,8 @@ export default function TodayPage() {
 
       {isLoading ? (
         <TodoItemSkeleton />
+      ) : todosData.length === 0 ? (
+        <EmptyTodo />
       ) : (
         <TodoList filteredTodos={todosData} />
       )}
