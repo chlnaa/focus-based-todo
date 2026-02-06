@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 
-interface useWeekNavigationProps {
+interface UseWeekNavigationProps {
   currentDate: string | Date | dayjs.Dayjs;
   allowFuture?: boolean;
 }
@@ -8,7 +8,7 @@ interface useWeekNavigationProps {
 export function useWeekNavigation({
   currentDate,
   allowFuture = false,
-}: useWeekNavigationProps) {
+}: UseWeekNavigationProps) {
   const date = dayjs(currentDate);
 
   const getTodayDate = () => dayjs().format('YYYY-MM-DD');
