@@ -11,11 +11,23 @@ import { useQuery } from '@tanstack/react-query';
 import AddTodo from '@/features/todo/AddTodo';
 import MiniDashboardSkeleton from '@/components/skeleton/MiniDashboardSkeleton';
 import { TodoItemSkeleton } from '@/components/skeleton/TodoItemSkeleton';
+import ReadOnlyMessage from '@/components/common/ReadOnlyMessage';
+import dayjs from 'dayjs';
+
+type ReadOnlyVariant = 'past' | 'future';
 
 export default function TodayPage() {
   const todos = useTodo();
   const selectedDate = useSelectedDate();
   const setSelectedDate = useSetSelectedDate();
+
+  const isPast = dayjs(selectedDate).isBefore(dayjs(), 'day');
+  const isFuture = dayjs(selectedDate).isAfter(dayjs(), 'day');
+  const readOnlyVariant: ReadOnlyVariant | null = isPast
+    ? 'past'
+    : isFuture
+      ? 'future'
+      : null;
 
   const {
     todosData,
@@ -52,7 +64,12 @@ export default function TodayPage() {
         />
       )}
 
-      <AddTodo selectedDate={selectedDate} />
+      {readOnlyVariant && <ReadOnlyMessage variant={readOnlyVariant} />}
+
+      <AddTodo
+        selectedDate={selectedDate}
+        disabled={readOnlyVariant !== null}
+      />
 
       {isLoading ? (
         <TodoItemSkeleton />
