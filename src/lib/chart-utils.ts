@@ -2,9 +2,11 @@ import dayjs from 'dayjs';
 import { getDayStats } from '@/lib/utils';
 import type { ChartData, Todo } from '@/types/types';
 
-export const prepareChartData = (
-  todosByDate: Record<string, Todo[]>,
-): ChartData[] => {
+type TodosByDateMap = Record<string, Todo[]>;
+
+export default function prepareChartData(
+  todosByDate: TodosByDateMap,
+): ChartData[] {
   const existingEntries = Object.entries(todosByDate)
     .map(([dateStr, todos]) => ({
       dateStr,
@@ -44,4 +46,4 @@ export const prepareChartData = (
   }
 
   return filledData;
-};
+}

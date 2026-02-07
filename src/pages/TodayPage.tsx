@@ -6,7 +6,7 @@ import {
 import WeeklyCalendar from '@/features/date/WeeklyCalendar';
 import MiniDashboard from '@/features/dashboard/MiniDashboard';
 import TodoList from '@/features/todo/TodoList';
-import { useDayDashboard } from '@/hooks/useDayDashboard';
+import useDayDashboard from '@/hooks/useDayDashboard';
 import { useQuery } from '@tanstack/react-query';
 import AddTodo from '@/features/todo/AddTodo';
 import MiniDashboardSkeleton from '@/components/skeleton/MiniDashboardSkeleton';
@@ -37,7 +37,7 @@ export default function TodayPage() {
     completionRate,
     completedCount,
     totalCount,
-  } = useDayDashboard(todos, selectedDate);
+  } = useDayDashboard({ todos, targetDate: selectedDate });
 
   const { isLoading, isError } = useQuery({
     queryKey: ['todos', selectedDate],

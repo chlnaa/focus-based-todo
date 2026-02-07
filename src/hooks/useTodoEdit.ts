@@ -6,7 +6,7 @@ interface UseTodoEditProps {
   onUpdate: (id: string, updates: Partial<Todo>) => void;
 }
 
-export const useTodoEdit = ({ todo, onUpdate }: UseTodoEditProps) => {
+export default function useTodoEdit({ todo, onUpdate }: UseTodoEditProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState(todo.text);
 
@@ -44,4 +44,4 @@ export const useTodoEdit = ({ todo, onUpdate }: UseTodoEditProps) => {
     handleKeyDown,
     handleEditCancel,
   };
-};
+}

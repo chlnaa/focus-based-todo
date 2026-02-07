@@ -6,9 +6,9 @@ import type { Todo } from '@/types/types';
 import { Pencil, Trash2 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useNavigate } from 'react-router';
-import { AlertModal } from '@/components/modal/AlertModal';
+import AlertModal from '@/components/modal/AlertModal';
 import TodoTextEditor from '@/components/common/TodoTextEditor';
-import { useTodoEdit } from '@/hooks/useTodoEdit';
+import useTodoEdit from '@/hooks/useTodoEdit';
 
 interface TodoItemProps {
   todo: Todo;

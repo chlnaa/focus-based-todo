@@ -2,7 +2,7 @@ import CustomDurationModal from '@/components/modal/CustomDurationModal';
 import { FocusStopModal } from '@/components/modal/FocusStopModal';
 import TimerCompletionModal from '@/components/modal/TimerCompletionModal';
 import { Button } from '@/components/ui/button';
-import { useTimer } from '@/hooks/useTimer';
+import useTimer from '@/hooks/useTimer';
 import { formatTime } from '@/lib/utils';
 import { useAddFocusTime, useTodo, useUpdateTodo } from '@/stores/useTodoStore';
 import { Play, Square, MoveLeft, Pause } from 'lucide-react';

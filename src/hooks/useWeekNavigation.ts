@@ -5,7 +5,7 @@ interface UseWeekNavigationProps {
   allowFuture?: boolean;
 }
 
-export function useWeekNavigation({
+export default function useWeekNavigation({
   currentDate,
   allowFuture = false,
 }: UseWeekNavigationProps) {

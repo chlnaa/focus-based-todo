@@ -10,11 +10,15 @@ import {
 import { EllipsisVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
-import { useTodoEdit } from '@/hooks/useTodoEdit';
+import useTodoEdit from '@/hooks/useTodoEdit';
 import TodoTextEditor from '@/components/common/TodoTextEditor';
-import { AlertModal } from '@/components/modal/AlertModal';
+import AlertModal from '@/components/modal/AlertModal';
 
-export default function HistoryTodoRow({ todo }: { todo: Todo }) {
+interface HistoryTodoRowProps {
+  todo: Todo;
+}
+
+export default function HistoryTodoRow({ todo }: HistoryTodoRowProps) {
   const deleteTodo = useDeleteTodo();
   const updateTodo = useUpdateTodo();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -26,7 +30,7 @@ export default function HistoryTodoRow({ todo }: { todo: Todo }) {
     handleEditClick,
     handleEditSubmit,
     handleKeyDown,
-  } = useTodoEdit(todo, updateTodo);
+  } = useTodoEdit({ todo, onUpdate: updateTodo });
 
   const { id, status, totalFocusTime } = todo;
 
