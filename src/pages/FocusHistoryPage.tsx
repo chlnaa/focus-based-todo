@@ -1,9 +1,9 @@
-import { prepareChartData } from '@/lib/chart-utils';
+import prepareChartData from '@/lib/chart-utils';
 import DayHistoryCard from '@/features/history/DayHistoryCard';
 import DateNavigationHeader from '@/features/history/DateNavigationHeader';
 import FocusTimeBarChart from '@/features/history/FocusTimeBarChart';
 import FocusTrendChart from '@/features/history/FocusTrendChart';
-import { useWeekNavigation } from '@/hooks/useWeekNavigation';
+import useWeekNavigation from '@/hooks/useWeekNavigation';
 import { getDayStats } from '@/lib/utils';
 import {
   useSelectedDate,

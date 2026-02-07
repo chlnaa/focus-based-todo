@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import dayjs from 'dayjs';
-import { useWeekNavigation } from '@/hooks/useWeekNavigation';
+import useWeekNavigation from '@/hooks/useWeekNavigation';
 import DateNavigationHeader from '../history/DateNavigationHeader';
 import TodayClock from './TodayClock';
 
