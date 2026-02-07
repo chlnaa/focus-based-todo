@@ -1,7 +1,7 @@
 import { useTodo } from '@/stores/useTodoStore';
 import MiniDashboard from '../../features/dashboard/MiniDashboard';
 import HistoryTodoRow from '../../features/history/HistoryTodoRow';
-import { useDayDashboard } from '@/hooks/useDayDashboard';
+import useDayDashboard from '@/hooks/useDayDashboard';
 import { DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { DialogDescription } from '@radix-ui/react-dialog';
 
@@ -18,7 +18,7 @@ export default function HistoryDetailModal({ date }: HistoryDetailModalProps) {
     completionRate,
     completedCount,
     totalCount,
-  } = useDayDashboard(todos, date!);
+  } = useDayDashboard({ todos, targetDate: date! });
 
   return (
     <DialogContent className="max-w-[90vw] md:max-w-2xl w-full border-2 rounded-4xl p-4 sm:p-8 ">
