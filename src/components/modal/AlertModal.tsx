@@ -14,7 +14,11 @@ interface AlertModalProps {
   onConfirm: () => void;
 }
 
-export function AlertModal({ open, onOpenChange, onConfirm }: AlertModalProps) {
+export default function AlertModal({
+  open,
+  onOpenChange,
+  onConfirm,
+}: AlertModalProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>

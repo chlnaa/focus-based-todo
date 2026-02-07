@@ -8,7 +8,10 @@ interface UseTimerProps {
   onComplete: () => void;
 }
 
-export const useTimer = ({ initialSeconds, onComplete }: UseTimerProps) => {
+export default function useTimer({
+  initialSeconds,
+  onComplete,
+}: UseTimerProps) {
   const [status, setStatus] = useState<TimerStatus>('idle');
   const [timeLeft, setTimeLeft] = useState(initialSeconds);
   const [currentInitialTime, setCurrentInitialTime] = useState(initialSeconds);
@@ -50,4 +53,4 @@ export const useTimer = ({ initialSeconds, onComplete }: UseTimerProps) => {
     stop,
     setTimeLeft,
   };
-};
+}
