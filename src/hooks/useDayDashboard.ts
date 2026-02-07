@@ -3,17 +3,14 @@ import type { Todo } from '@/types/types';
 import { useMemo } from 'react';
 
 interface UseDayDashboardProps {
-  todosData: Todo[];
-  formattedFocusTime: string;
-  completionRate: number;
-  completedCount: number;
-  totalCount: number;
+  todos: Todo[];
+  targetDate: string;
 }
 
-export const useDayDashboard = (
-  todos: Todo[],
-  targetDate: string,
-): UseDayDashboardProps => {
+export default function useDayDashboard({
+  todos,
+  targetDate,
+}: UseDayDashboardProps) {
   const todosData = useMemo(
     () => todos.filter((todo) => todo.date === targetDate),
     [todos, targetDate],
@@ -32,4 +29,4 @@ export const useDayDashboard = (
     completedCount: stats.completedCount || 0,
     totalCount: stats.totalCount,
   };
-};
+}
