@@ -33,7 +33,7 @@ export const useTodoStore = create(
 
             set(
               (state) => ({
-                todos: [newTodo, ...state.todos],
+                todos: [...state.todos, newTodo],
               }),
               false,
               'todo/add',
