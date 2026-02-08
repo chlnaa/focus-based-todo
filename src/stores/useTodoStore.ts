@@ -82,14 +82,6 @@ export const useTodoStore = create(
 
           setSelectedDate: (date: string) => set({ selectedDate: date }),
 
-          startFocus: (id: string) => {
-            set({ currentFocusTodoId: id }, false, 'todo/startFocus');
-          },
-
-          stopFocus: () => {
-            set({ currentFocusTodoId: null }, false, 'todo/stopFocus');
-          },
-
           addFocusTime: (id: string, seconds: number) => {
             set(
               (state) => ({
@@ -132,10 +124,6 @@ export const useSelectedDate = () =>
 
 export const useSetSelectedDate = () =>
   useTodoStore((store) => store.setSelectedDate);
-
-export const useStartFocus = () => useTodoStore((store) => store.startFocus);
-
-export const useStopFocus = () => useTodoStore((store) => store.stopFocus);
 
 export const useAddFocusTime = () =>
   useTodoStore((store) => store.addFocusTime);
