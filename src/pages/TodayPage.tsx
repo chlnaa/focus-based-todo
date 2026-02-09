@@ -82,7 +82,7 @@ export default function TodayPage() {
 
       {isLoading ? (
         <TodoItemSkeleton />
-      ) : todosData.length === 0 ? (
+      ) : !readOnlyVariant && todosData.length === 0 ? (
         <EmptyTodo />
       ) : (
         <TodoList filteredTodos={todosData} />
