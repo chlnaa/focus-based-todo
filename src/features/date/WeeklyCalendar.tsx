@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import dayjs from 'dayjs';
 import useWeekNavigation from '@/hooks/useWeekNavigation';
-import DateNavigationHeader from '../history/DateNavigationHeader';
+import DateNavigationHeader from '../../components/common/DateNavigationHeader';
 import TodayClock from './TodayClock';
 
 interface WeeklyCalendarProps {

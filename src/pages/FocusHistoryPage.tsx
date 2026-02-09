@@ -1,6 +1,6 @@
 import prepareChartData from '@/lib/chart-utils';
 import DayHistoryCard from '@/features/history/DayHistoryCard';
-import DateNavigationHeader from '@/features/history/DateNavigationHeader';
+import DateNavigationHeader from '@/components/common/DateNavigationHeader';
 import FocusTimeBarChart from '@/features/history/FocusTimeBarChart';
 import FocusTrendChart from '@/features/history/FocusTrendChart';
 import useWeekNavigation from '@/hooks/useWeekNavigation';
