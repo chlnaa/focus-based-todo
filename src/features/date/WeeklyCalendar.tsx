@@ -6,12 +6,16 @@ import TodayClock from './TodayClock';
 
 interface WeeklyCalendarProps {
   selectedDate: string;
-  onDateSelect: (date: string) => void;
+  viewDate: string;
+  onChangeViewDate: (date: string) => void;
+  onSelectDate: (date: string) => void;
 }
 
 export default function WeeklyCalendar({
   selectedDate,
-  onDateSelect,
+  viewDate,
+  onChangeViewDate,
+  onSelectDate,
 }: WeeklyCalendarProps) {
   const {
     baseDate,
@@ -20,16 +24,20 @@ export default function WeeklyCalendar({
     getPrevWeekDate,
     getNextWeekDate,
   } = useWeekNavigation({
-    currentDate: selectedDate || dayjs(),
+    currentDate: viewDate,
     allowFuture: true,
   });
 
-  const goToday = () => onDateSelect(getTodayDate());
-  const goPrevWeek = () => onDateSelect(getPrevWeekDate());
+  const goToday = () => {
+    const today = getTodayDate();
+    onChangeViewDate(today);
+    onSelectDate(today);
+  };
+  const goPrevWeek = () => onChangeViewDate(getPrevWeekDate());
   const goNextWeek = () => {
     const next = getNextWeekDate();
     if (!next) return;
-    onDateSelect(next);
+    onChangeViewDate(next);
   };
 
   const daysInWeek = Array.from({ length: 7 }, (_, i) => {
@@ -75,7 +83,7 @@ export default function WeeklyCalendar({
             <Button
               className={`text-lg sm:text-xl transition-all ${day.isSelected ? 'p-3 sm:p-4 text-xl sm:text-2xl' : 'text-gray-600'}`}
               variant={day.isSelected ? 'default' : 'ghost'}
-              onClick={() => onDateSelect(day.fullDate)}
+              onClick={() => onSelectDate(day.fullDate)}
             >
               {day.dateNumber}
             </Button>
