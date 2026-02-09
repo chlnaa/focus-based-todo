@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   useSelectedDate,
   useSetSelectedDate,
@@ -22,6 +23,8 @@ export default function TodayPage() {
   const todos = useTodo();
   const selectedDate = useSelectedDate();
   const setSelectedDate = useSetSelectedDate();
+
+  const [viewDate, setViewDate] = useState(selectedDate);
 
   const isPast = dayjs(selectedDate).isBefore(dayjs(), 'day');
   const isFuture = dayjs(selectedDate).isAfter(dayjs(), 'day');
@@ -54,7 +57,9 @@ export default function TodayPage() {
     <div className="flex flex-col gap-4">
       <WeeklyCalendar
         selectedDate={selectedDate}
-        onDateSelect={setSelectedDate}
+        viewDate={viewDate}
+        onChangeViewDate={setViewDate}
+        onSelectDate={setSelectedDate}
       />
 
       {isLoading ? (
