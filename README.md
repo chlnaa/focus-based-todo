@@ -119,7 +119,7 @@ These will be introduced incrementally after deployment.
 
 ## 🔗 Live Demo
 
-(Will be added after deployment)
+focus-based-todo.vercel.app
 
 ---
 
