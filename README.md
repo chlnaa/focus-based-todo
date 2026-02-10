@@ -1,73 +1,128 @@
-# React + TypeScript + Vite
+# 📝 Focusdo App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[English] | [한국어](./README.ko.md) | [日本語](./README.ja.md)
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+A productivity application that combines daily todo management with a focus timer.  
+This project focuses on clear state ownership, predictable UI flows, and a scalable front-end architecture.
 
-## React Compiler
+Designed for users who want to manage daily tasks with intentional focus,
+instead of juggling multiple fragmented productivity tools.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## ✨ Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- 📅 Date-based todo management
+- ⏱️ Focus timer with preset and custom durations
+- 🧠 Automatic focus time accumulation per task
+- 🚫 Read-only mode for past and future dates
+- 📊 Daily dashboard (completion rate, total focus time, completed tasks)
+- 📈 Focus history view (daily / weekly)
+- ⚠️ Explicit Loading / Empty / Error UI states
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 🗂️ Pages
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- **Today Page**  
+  Main page for adding, editing, and managing daily todos, with a dashboard summary.
+
+- **Focus Page**  
+  Dedicated page for running focus sessions on a selected todo.
+
+- **Focus History Page**  
+  Visualizes daily and weekly focus history records.Visualizes weekly focus trends using charts,  
+  while daily records are presented as summary cards with detailed views in a modal.
+
+---
+
+## 🛠️ Tech Stack
+
+- **React + TypeScript**
+- **Zustand** — global state management
+- **TanStack Query** — async state handling
+- **React Router**
+- **Tailwind CSS**
+- **shadcn/ui** — accessible UI components
+- **Day.js** — date utilities
+
+---
+
+## 🧩 Architecture Notes
+
+State flows are intentionally unidirectional:
+user interaction → page orchestration → store mutation → derived UI.
+
+- **Page-level orchestration**  
+  Page components do not implement domain logic directly.  
+  Instead, they orchestrate UI flow by composing stores and custom hooks.
+
+- **Domain logic isolation**  
+  Todo and focus-related business logic is isolated within stores and hooks.
+
+- **Explicit UI state modeling**  
+  Loading, empty, read-only, and error states are intentionally modeled and rendered.
+
+- **No premature optimization**  
+  Advanced optimizations such as virtualization or infinite scroll  
+  will be introduced only when real usage patterns require them.
+
+---
+
+## 🧠 Design Decisions
+
+- Read-only dates are modeled as an explicit UI state to prevent misleading interactions.
+- Empty states reflect whether the current date context allows user interaction.
+- Date navigation logic is kept stateless to avoid hidden coupling across pages.
+
+---
+
+## ⚖️ Known Trade-offs
+
+- All data is currently stored in memory for faster iteration.
+- Focus history visualization prioritizes clarity over performance at scale.
+- Mobile UX is functional but not fully optimized for very small screens.
+
+---
+
+## 🚀 Getting Started
+
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 📌 Pre-release Scope
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+The following features are intentionally excluded in the initial release:
+
+- Backend integration
+- Authentication
+- Persistent storage
+
+These will be introduced incrementally after deployment.
+
+---
+
+## 📈 Future Improvements
+
+- List virtualization or infinite scroll
+- Persistent storage or backend sync
+- Extended focus analytics
+- Further mobile UX refinements
+
+---
+
+## 🔗 Live Demo
+
+(Will be added after deployment)
+
+---
+
+## 📄 License
+
+MIT
