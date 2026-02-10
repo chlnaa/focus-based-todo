@@ -128,7 +128,7 @@ npm run dev
 
 ## 🔗 ライブデモ
 
-（デプロイ後に追加予定）
+focus-based-todo.vercel.app
 
 ---
 
