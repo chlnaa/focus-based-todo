@@ -17,7 +17,6 @@ export const useTodoStore = create(
         {
           todos: initialTodos,
           selectedDate: dayjs().format('YYYY-MM-DD'),
-          currentFocusTodoId: null as string | null,
         },
 
         (set) => ({
