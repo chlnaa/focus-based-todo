@@ -33,9 +33,9 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Toaster richColors position="top-center" />
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
+      <Toaster richColors position="top-center" />
     </QueryClientProvider>
   </StrictMode>,
 );
