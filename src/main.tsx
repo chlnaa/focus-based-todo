@@ -8,6 +8,7 @@ import TodayPage from './pages/TodayPage.tsx';
 import FocusPage from './pages/FocusPage.tsx';
 import FocusHistoryPage from './pages/FocusHistoryPage.tsx';
 import SignUpPage from './pages/SignUpPage.tsx';
+import SignInPage from './pages/SignInPage.tsx';
 import { Toaster } from './components/ui/sonner.tsx';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -22,7 +23,8 @@ const router = createBrowserRouter([
       { index: true, element: <TodayPage /> },
       { path: '/today', element: <TodayPage /> },
       { path: '/history', element: <FocusHistoryPage /> },
-      { path: '/signUp', element: <SignUpPage /> },
+      { path: '/sign-up', element: <SignUpPage /> },
+      { path: '/sign-in', element: <SignInPage /> },
     ],
   },
   { path: '/focus', element: <FocusPage /> },
