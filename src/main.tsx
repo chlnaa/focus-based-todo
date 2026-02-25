@@ -7,31 +7,54 @@ import NotFound from './pages/NotFound.tsx';
 import TodayPage from './pages/TodayPage.tsx';
 import FocusPage from './pages/FocusPage.tsx';
 import FocusHistoryPage from './pages/FocusHistoryPage.tsx';
+import SignUpPage from './pages/SignUpPage.tsx';
+import SignInPage from './pages/SignInPage.tsx';
+import SessionProvider from './provider/SessionProvider.tsx';
 import { Toaster } from './components/ui/sonner.tsx';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import MemberOnlyLayout from './components/layout/MemberOnlyLayout.tsx';
+import ForgetPasswordPage from './pages/ForgetPasswordPage.tsx';
+import ResetPasswordPage from './pages/ResetPasswordPage.tsx';
+import GuestOnlyLayout from './components/layout/GuestOnlyLayout.tsx';
 
 const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
-    path: '/',
     element: <App />,
     errorElement: <NotFound />,
     children: [
-      { index: true, element: <TodayPage /> },
-      { path: '/today', element: <TodayPage /> },
-      { path: '/history', element: <FocusHistoryPage /> },
+      {
+        element: <GuestOnlyLayout />,
+        children: [
+          { path: '/sign-up', element: <SignUpPage /> },
+          { path: '/sign-in', element: <SignInPage /> },
+          { path: '/forget-password', element: <ForgetPasswordPage /> },
+        ],
+      },
+
+      {
+        element: <MemberOnlyLayout />,
+        children: [
+          { index: true, element: <TodayPage /> },
+          { path: '/today', element: <TodayPage /> },
+          { path: '/history', element: <FocusHistoryPage /> },
+          { path: '/focus', element: <FocusPage /> },
+          { path: '/focus/:todoId', element: <FocusPage /> },
+          { path: '/reset-password', element: <ResetPasswordPage /> },
+        ],
+      },
     ],
   },
-  { path: '/focus', element: <FocusPage /> },
-  { path: '/focus/:todoId', element: <FocusPage /> },
 ]);
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Toaster richColors position="top-center" />
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+      <SessionProvider>
+        <RouterProvider router={router} />
+        <Toaster richColors position="top-center" />
+      </SessionProvider>
     </QueryClientProvider>
   </StrictMode>,
 );
