@@ -17,3 +17,10 @@ export interface ChartData {
   completionRate: number;
   totalMinutes: number;
 }
+
+export type UseMutationCallback = {
+  onSuccess?: () => void;
+  onError?: (error: Error) => void;
+  onMutate?: () => void;
+  onSettled?: () => void;
+};
