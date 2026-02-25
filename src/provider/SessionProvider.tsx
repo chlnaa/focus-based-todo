@@ -13,7 +13,7 @@ export default function SessionProvider({ children }: SessionProviderProps) {
   const isSessionLoaded = useIsSessionLoaded();
 
   useEffect(() => {
-    supabase.auth.onAuthStateChange((event, session) => {
+    supabase.auth.onAuthStateChange((_, session) => {
       setSession(session);
     });
   }, []);
