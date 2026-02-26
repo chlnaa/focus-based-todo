@@ -1,3 +1,7 @@
+import type { Database } from '@/database.types';
+
+export type TodoEntity = Database['public']['Tables']['todo']['Row'];
+
 export type TodoStatus = 'active' | 'completed';
 
 export interface Todo {
