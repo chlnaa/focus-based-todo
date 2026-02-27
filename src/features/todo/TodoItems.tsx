@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn, formatTime, isToday } from '@/lib/utils';
-import { useToggleTodo } from '@/stores/useTodoStore';
 import type { Todo } from '@/types/types';
 import { Pencil, Trash2 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -13,15 +12,25 @@ import useTodoEdit from '@/hooks/useTodoEdit';
 interface TodoItemProps {
   todo: Todo;
   onDelete: (id: string) => void;
-  onUpdate: (id: string, updates: Partial<Todo>) => void;
+  onUpdate: (payload: { id: string; updates: Partial<Todo> }) => void;
 }
 
 export default function TodoItems({ todo, onDelete, onUpdate }: TodoItemProps) {
   const navigate = useNavigate();
 
-  const { id, status, totalFocusTime, date } = todo;
+  const { id, status, total_focus_time, date } = todo;
 
   const isReadOnly = !isToday(date);
+
+  const handleToggle = (checked: boolean) => {
+    if (isReadOnly) return;
+    onUpdate({
+      id,
+      updates: {
+        status: checked ? 'completed' : 'active',
+      },
+    });
+  };
 
   const [showModal, setShowModal] = useState(false);
   const openDeleteModal = () => setShowModal(true);
@@ -29,9 +38,6 @@ export default function TodoItems({ todo, onDelete, onUpdate }: TodoItemProps) {
     onDelete(id);
     setShowModal(false);
   };
-
-  const toggleTodoStatus = useToggleTodo();
-  const handleToggle = () => toggleTodoStatus(id);
 
   const {
     isEditing,
@@ -93,7 +99,7 @@ export default function TodoItems({ todo, onDelete, onUpdate }: TodoItemProps) {
       </div>
       <div className="flex justify-end items-center w-full">
         <div className="mr-5">
-          {formatTime(totalFocusTime || 0).fullTimeDisplay}
+          {formatTime(total_focus_time || 0).fullTimeDisplay}
         </div>
         <Button
           onClick={() => navigate(`/focus/${id}`)}

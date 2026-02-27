@@ -5,28 +5,22 @@ import FocusTimeBarChart from '@/features/history/FocusTimeBarChart';
 import FocusTrendChart from '@/features/history/FocusTrendChart';
 import useWeekNavigation from '@/hooks/useWeekNavigation';
 import { getDayStats } from '@/lib/utils';
-import { useSelectedDate, useTodo } from '@/stores/useTodoStore';
+import { useSelectedDate } from '@/stores/useTodoStore';
 import type { Todo } from '@/types/types';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import FocusHistoryLoading from '@/components/skeleton/FocusHistoryLoading';
 import ErrorState from '@/components/common/ErrorState';
+import { useSession } from '@/stores/session';
+import { useAllTodos } from '@/hooks/queries/useAllTodos';
 
 export default function FocusHistoryPage() {
-  const historyTodos = useTodo();
+  const session = useSession();
   const selectedDate = useSelectedDate();
-
   const [historyBaseDate, setHistoryBaseDate] = useState(selectedDate);
 
-  const { isLoading, isError } = useQuery({
-    queryKey: ['focusHistory'],
-    queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      return historyTodos;
-    },
-    staleTime: 0,
-  });
+  const userId = session?.user.id;
+  const { data: historyTodos = [], isLoading, isError } = useAllTodos(userId);
 
   const { baseDate, currentMonth, getPrevWeekDate, getNextWeekDate } =
     useWeekNavigation({ currentDate: historyBaseDate, allowFuture: false });

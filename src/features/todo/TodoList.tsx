@@ -1,14 +1,28 @@
-import { useDeleteTodo, useUpdateTodo } from '@/stores/useTodoStore';
 import type { Todo } from '@/types/types';
 import TodoItems from './TodoItems';
+import { useQueryClient } from '@tanstack/react-query';
+import { useDeleteTodo } from '@/hooks/mutations/todo/useDeleteTodo';
+import { useUpdateTodo } from '@/hooks/mutations/todo/useUpdateTodo';
+import { useSelectedDate } from '@/stores/useTodoStore';
 
 interface TodolistProps {
   filteredTodos: Todo[];
 }
 
 export default function TodoList({ filteredTodos }: TodolistProps) {
-  const updateTodo = useUpdateTodo();
-  const deleteTodo = useDeleteTodo();
+  const queryClient = useQueryClient();
+  const selectedDate = useSelectedDate();
+
+  const { mutate: deleteTodo } = useDeleteTodo({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['todo', selectedDate] });
+    },
+  });
+  const { mutate: updateTodo } = useUpdateTodo({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['todo', selectedDate] });
+    },
+  });
 
   return (
     <ul className="mt-3 ">

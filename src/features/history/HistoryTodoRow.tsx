@@ -1,6 +1,5 @@
 import type { Todo } from '@/types/types';
 import { cn, formatTime } from '@/lib/utils';
-import { useDeleteTodo, useUpdateTodo } from '@/stores/useTodoStore';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -13,15 +12,30 @@ import { useState } from 'react';
 import useTodoEdit from '@/hooks/useTodoEdit';
 import TodoTextEditor from '@/components/common/TodoTextEditor';
 import AlertModal from '@/components/modal/AlertModal';
+import { useQueryClient } from '@tanstack/react-query';
+import { useDeleteTodo } from '@/hooks/mutations/todo/useDeleteTodo';
+import { useUpdateTodo } from '@/hooks/mutations/todo/useUpdateTodo';
 
 interface HistoryTodoRowProps {
   todo: Todo;
+  date: string;
 }
 
-export default function HistoryTodoRow({ todo }: HistoryTodoRowProps) {
-  const deleteTodo = useDeleteTodo();
-  const updateTodo = useUpdateTodo();
+export default function HistoryTodoRow({ todo, date }: HistoryTodoRowProps) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const queryClient = useQueryClient();
+
+  const { mutate: deleteTodo } = useDeleteTodo({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['todo', date] });
+    },
+  });
+  const { mutate: updateTodo } = useUpdateTodo({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['todo', date] });
+    },
+  });
 
   const {
     isEditing,
@@ -32,7 +46,7 @@ export default function HistoryTodoRow({ todo }: HistoryTodoRowProps) {
     handleKeyDown,
   } = useTodoEdit({ todo, onUpdate: updateTodo });
 
-  const { id, status, totalFocusTime } = todo;
+  const { id, status, total_focus_time } = todo;
 
   return (
     <li key={id} className="flex justify-between items-center px-5 py-2">
@@ -48,7 +62,7 @@ export default function HistoryTodoRow({ todo }: HistoryTodoRowProps) {
 
         {!isEditing && (
           <span className="ml-3 font-mono text-sm">
-            {formatTime(totalFocusTime || 0).fullTimeDisplay}
+            {formatTime(total_focus_time || 0).fullTimeDisplay}
           </span>
         )}
       </div>
