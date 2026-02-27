@@ -2,21 +2,30 @@ import CustomDurationModal from '@/components/modal/CustomDurationModal';
 import { FocusStopModal } from '@/components/modal/FocusStopModal';
 import TimerCompletionModal from '@/components/modal/TimerCompletionModal';
 import { Button } from '@/components/ui/button';
+import { useUpdateTodo } from '@/hooks/mutations/todo/useUpdateTodo';
+import { useTodoById } from '@/hooks/queries/useTodoById';
 import useTimer from '@/hooks/useTimer';
 import { formatTime } from '@/lib/utils';
-import { useAddFocusTime, useTodo, useUpdateTodo } from '@/stores/useTodoStore';
-import { Play, Square, MoveLeft, Pause } from 'lucide-react';
+import type { Todo } from '@/types/types';
+import { useQueryClient } from '@tanstack/react-query';
+import { MoveLeft, Pause, Play, Square } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
 export default function FocusPage() {
+  const queryClient = useQueryClient();
+
   const navigate = useNavigate();
   const { todoId } = useParams<{ todoId: string }>();
 
-  const todos = useTodo();
-  const currentTodo = todos.find((t) => t.id === todoId);
-  const addFocusTime = useAddFocusTime();
-  const updateTodoStatus = useUpdateTodo();
+  const { data: currentTodo } = useTodoById(todoId);
+
+  const { mutate: updateTodo } = useUpdateTodo({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['todo', todoId] });
+      queryClient.invalidateQueries({ queryKey: ['todos'] });
+    },
+  });
 
   const [isStopModalOpen, setIsStopModalOpen] = useState(false);
   const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false);
@@ -54,11 +63,20 @@ export default function FocusPage() {
     const focusedSeconds = initialTime - timeLeft;
 
     if (focusedSeconds > 0) {
-      addFocusTime(todoId, focusedSeconds);
+      const newTotal = (currentTodo.total_focus_time ?? 0) + focusedSeconds;
+
+      const updates: Partial<Todo> = {
+        total_focus_time: newTotal,
+      };
 
       if (timeLeft === 0 && currentTodo.status !== 'completed') {
-        updateTodoStatus(todoId, { status: 'completed' });
+        updates.status = 'completed';
       }
+
+      updateTodo({
+        id: todoId,
+        updates,
+      });
     }
     navigate('/');
   };
@@ -134,7 +152,7 @@ export default function FocusPage() {
 
         <div className="flex gap-3">
           <div className="text-muted-foreground">Total Focus Time</div>
-          <div>{formatTime(currentTodo.totalFocusTime).fullTimeDisplay}</div>
+          <div>{formatTime(currentTodo.total_focus_time).fullTimeDisplay}</div>
         </div>
       </footer>
 
@@ -153,8 +171,8 @@ export default function FocusPage() {
       <TimerCompletionModal
         open={isCompletionModalOpen}
         onConfirm={handleSaveAndExit}
-        totalFocusTime={
-          formatTime(currentTodo.totalFocusTime + initialTime).fullTimeDisplay
+        total_focus_time={
+          formatTime(currentTodo.total_focus_time + initialTime).fullTimeDisplay
         }
       />
     </div>
