@@ -1,6 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useAddTodo } from '@/stores/useTodoStore';
+import { useCreateTodo } from '@/hooks/mutations/todo/useCreateTodo';
+import { useSession } from '@/stores/session';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 
 interface AddTodoProps {
@@ -9,16 +11,27 @@ interface AddTodoProps {
 }
 
 export default function AddTodo({ selectedDate, disabled }: AddTodoProps) {
-  const addTodo = useAddTodo();
+  const session = useSession();
+  const queryClient = useQueryClient();
   const [text, setText] = useState('');
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const { mutate: createTodo, isPending: isCreateTodoPending } = useCreateTodo({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['todo', selectedDate] });
+      setText('');
+    },
+  });
+
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (disabled) return;
     if (text.trim().length === 0) return;
 
-    addTodo(text.trim(), selectedDate);
-    setText('');
+    createTodo({
+      text: text.trim(),
+      date: selectedDate,
+      user_id: session!.user.id,
+    });
   };
 
   if (disabled) return null;
@@ -28,9 +41,10 @@ export default function AddTodo({ selectedDate, disabled }: AddTodoProps) {
       <Input
         value={text}
         onChange={(e) => setText(e.target.value)}
+        disabled={isCreateTodoPending}
         placeholder="New Todo"
       />
-      <Button>Add</Button>
+      <Button disabled={isCreateTodoPending}>Add</Button>
     </form>
   );
 }

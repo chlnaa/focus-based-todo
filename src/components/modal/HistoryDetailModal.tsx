@@ -1,16 +1,18 @@
-import { useTodo } from '@/stores/useTodoStore';
 import MiniDashboard from '../../features/dashboard/MiniDashboard';
 import HistoryTodoRow from '../../features/history/HistoryTodoRow';
 import useDayDashboard from '@/hooks/useDayDashboard';
 import { DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { DialogDescription } from '@radix-ui/react-dialog';
+import { useSession } from '@/stores/session';
+import { useTodo } from '@/hooks/queries/useTodo';
 
 interface HistoryDetailModalProps {
   date: string;
 }
 
 export default function HistoryDetailModal({ date }: HistoryDetailModalProps) {
-  const todos = useTodo();
+  const session = useSession();
+  const { data: todos = [] } = useTodo(date!, session?.user.id);
 
   const {
     todosData,
@@ -42,7 +44,7 @@ export default function HistoryDetailModal({ date }: HistoryDetailModalProps) {
 
       <ul className="space-y-4">
         {todosData.map((todo) => (
-          <HistoryTodoRow key={todo.id} todo={todo} />
+          <HistoryTodoRow key={todo.id} todo={todo} date={date} />
         ))}
       </ul>
     </DialogContent>

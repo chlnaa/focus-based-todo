@@ -1,14 +1,10 @@
 import { useState } from 'react';
-import {
-  useSelectedDate,
-  useSetSelectedDate,
-  useTodo,
-} from '@/stores/useTodoStore';
+import { useSession } from '@/stores/session';
+import { useSelectedDate, useSetSelectedDate } from '@/stores/useTodoStore';
 import WeeklyCalendar from '@/features/date/WeeklyCalendar';
 import MiniDashboard from '@/features/dashboard/MiniDashboard';
 import TodoList from '@/features/todo/TodoList';
 import useDayDashboard from '@/hooks/useDayDashboard';
-import { useQuery } from '@tanstack/react-query';
 import AddTodo from '@/features/todo/AddTodo';
 import MiniDashboardSkeleton from '@/components/skeleton/MiniDashboardSkeleton';
 import { TodoItemSkeleton } from '@/components/skeleton/TodoItemSkeleton';
@@ -16,15 +12,25 @@ import ReadOnlyMessage from '@/components/common/ReadOnlyMessage';
 import EmptyTodo from '@/components/common/EmptyTodo';
 import ErrorState from '@/components/common/ErrorState';
 import dayjs from 'dayjs';
+import { useTodo } from '@/hooks/queries/useTodo';
 
 type ReadOnlyVariant = 'past' | 'future';
 
 export default function TodayPage() {
-  const todos = useTodo();
+  const session = useSession();
   const selectedDate = useSelectedDate();
   const setSelectedDate = useSetSelectedDate();
 
   const [viewDate, setViewDate] = useState(selectedDate);
+
+  const {
+    data: todosData = [],
+    isLoading,
+    isError,
+  } = useTodo(selectedDate, session?.user.id);
+
+  const { formattedFocusTime, completionRate, completedCount, totalCount } =
+    useDayDashboard({ todos: todosData, targetDate: selectedDate });
 
   const isPast = dayjs(selectedDate).isBefore(dayjs(), 'day');
   const isFuture = dayjs(selectedDate).isAfter(dayjs(), 'day');
@@ -34,24 +40,7 @@ export default function TodayPage() {
       ? 'future'
       : null;
 
-  const {
-    todosData,
-    formattedFocusTime,
-    completionRate,
-    completedCount,
-    totalCount,
-  } = useDayDashboard({ todos, targetDate: selectedDate });
-
-  const { isLoading, isError } = useQuery({
-    queryKey: ['todos', selectedDate],
-    queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      return selectedDate;
-    },
-    staleTime: 0,
-  });
-
-  if (isError) return <ErrorState message="Failed to load today's data." />;
+  if (isError) return <ErrorState message="Failed to load data." />;
 
   return (
     <div className="flex flex-col gap-4">
