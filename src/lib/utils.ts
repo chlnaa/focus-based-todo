@@ -25,7 +25,7 @@ export const getDayStats = (dayTodos: Todo[]) => {
   const totalCount = dayTodos.length;
 
   const totalFocusSeconds = dayTodos.reduce(
-    (acc, todo) => acc + (todo.totalFocusTime || 0),
+    (acc, todo) => acc + (todo.total_focus_time || 0),
     0,
   );
 
