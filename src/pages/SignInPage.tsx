@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import useSignIn from '@/hooks/mutations/useSignIn';
+import useSignIn from '@/hooks/mutations/auth/useSignIn';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { toast } from 'sonner';

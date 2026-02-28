@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import { Link } from 'react-router';
-import useSignUp from '@/hooks/mutations/useSignUp';
+import useSignUp from '@/hooks/mutations/auth/useSignUp';
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('');

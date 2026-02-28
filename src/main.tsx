@@ -17,6 +17,7 @@ import ForgetPasswordPage from './pages/ForgetPasswordPage.tsx';
 import ResetPasswordPage from './pages/ResetPasswordPage.tsx';
 import GuestOnlyLayout from './components/layout/GuestOnlyLayout.tsx';
 import AuthGuardLayout from './components/layout/AuthGuardLayout.tsx';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 const queryClient = new QueryClient();
 
@@ -61,6 +62,7 @@ createRoot(document.getElementById('root')!).render(
         <RouterProvider router={router} />
         <Toaster richColors position="top-center" />
       </SessionProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   </StrictMode>,
 );
