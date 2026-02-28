@@ -16,6 +16,7 @@ import MemberOnlyLayout from './components/layout/MemberOnlyLayout.tsx';
 import ForgetPasswordPage from './pages/ForgetPasswordPage.tsx';
 import ResetPasswordPage from './pages/ResetPasswordPage.tsx';
 import GuestOnlyLayout from './components/layout/GuestOnlyLayout.tsx';
+import AuthGuardLayout from './components/layout/AuthGuardLayout.tsx';
 
 const queryClient = new QueryClient();
 
@@ -39,9 +40,14 @@ const router = createBrowserRouter([
           { index: true, element: <TodayPage /> },
           { path: '/today', element: <TodayPage /> },
           { path: '/history', element: <FocusHistoryPage /> },
+          { path: '/reset-password', element: <ResetPasswordPage /> },
+        ],
+      },
+      {
+        element: <AuthGuardLayout />,
+        children: [
           { path: '/focus', element: <FocusPage /> },
           { path: '/focus/:todoId', element: <FocusPage /> },
-          { path: '/reset-password', element: <ResetPasswordPage /> },
         ],
       },
     ],
