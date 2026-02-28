@@ -12,7 +12,6 @@ import { useState } from 'react';
 import useTodoEdit from '@/hooks/useTodoEdit';
 import TodoTextEditor from '@/components/common/TodoTextEditor';
 import AlertModal from '@/components/modal/AlertModal';
-import { useQueryClient } from '@tanstack/react-query';
 import { useDeleteTodo } from '@/hooks/mutations/todo/useDeleteTodo';
 import { useUpdateTodo } from '@/hooks/mutations/todo/useUpdateTodo';
 
@@ -24,18 +23,8 @@ interface HistoryTodoRowProps {
 export default function HistoryTodoRow({ todo, date }: HistoryTodoRowProps) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const queryClient = useQueryClient();
-
-  const { mutate: deleteTodo } = useDeleteTodo({
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['todo', date] });
-    },
-  });
-  const { mutate: updateTodo } = useUpdateTodo({
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['todo', date] });
-    },
-  });
+  const { mutate: deleteTodo } = useDeleteTodo();
+  const { mutate: updateTodo } = useUpdateTodo();
 
   const {
     isEditing,

@@ -2,7 +2,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCreateTodo } from '@/hooks/mutations/todo/useCreateTodo';
 import { useSession } from '@/stores/session';
-import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 
 interface AddTodoProps {
@@ -12,14 +11,10 @@ interface AddTodoProps {
 
 export default function AddTodo({ selectedDate, disabled }: AddTodoProps) {
   const session = useSession();
-  const queryClient = useQueryClient();
   const [text, setText] = useState('');
 
   const { mutate: createTodo, isPending: isCreateTodoPending } = useCreateTodo({
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['todo', selectedDate] });
-      setText('');
-    },
+    onSuccess: () => setText(''),
   });
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {

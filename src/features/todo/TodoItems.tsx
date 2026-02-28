@@ -12,7 +12,11 @@ import useTodoEdit from '@/hooks/useTodoEdit';
 interface TodoItemProps {
   todo: Todo;
   onDelete: (id: string) => void;
-  onUpdate: (payload: { id: string; updates: Partial<Todo> }) => void;
+  onUpdate: (payload: {
+    id: string;
+    updates: Partial<Todo>;
+    date: string;
+  }) => void;
 }
 
 export default function TodoItems({ todo, onDelete, onUpdate }: TodoItemProps) {
@@ -29,6 +33,7 @@ export default function TodoItems({ todo, onDelete, onUpdate }: TodoItemProps) {
       updates: {
         status: checked ? 'completed' : 'active',
       },
+      date: todo.date,
     });
   };
 
