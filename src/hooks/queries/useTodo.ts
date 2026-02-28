@@ -1,9 +1,10 @@
 import { getTodosByDate } from '@/api/todo';
+import { todoKeys } from '@/constants/queryKeys';
 import { useQuery } from '@tanstack/react-query';
 
 export function useTodo(date: string, userId: string | undefined) {
   return useQuery({
-    queryKey: ['todo', date],
+    queryKey: todoKeys.byDate(date),
     queryFn: () => getTodosByDate(date, userId!),
     enabled: !!userId,
     staleTime: 1000 * 60 * 5,
