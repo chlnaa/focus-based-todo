@@ -6,26 +6,21 @@ import { useUpdateTodo } from '@/hooks/mutations/todo/useUpdateTodo';
 import { useTodoById } from '@/hooks/queries/useTodoById';
 import useTimer from '@/hooks/useTimer';
 import { formatTime } from '@/lib/utils';
+import { useSelectedDate } from '@/stores/useTodoStore';
 import type { Todo } from '@/types/types';
-import { useQueryClient } from '@tanstack/react-query';
 import { MoveLeft, Pause, Play, Square } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
 export default function FocusPage() {
-  const queryClient = useQueryClient();
+  const selectedDate = useSelectedDate();
 
   const navigate = useNavigate();
   const { todoId } = useParams<{ todoId: string }>();
 
   const { data: currentTodo } = useTodoById(todoId);
 
-  const { mutate: updateTodo } = useUpdateTodo({
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['todo', todoId] });
-      queryClient.invalidateQueries({ queryKey: ['todos'] });
-    },
-  });
+  const { mutate: updateTodo } = useUpdateTodo();
 
   const [isStopModalOpen, setIsStopModalOpen] = useState(false);
   const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false);
@@ -76,6 +71,7 @@ export default function FocusPage() {
       updateTodo({
         id: todoId,
         updates,
+        date: selectedDate,
       });
     }
     navigate('/');
