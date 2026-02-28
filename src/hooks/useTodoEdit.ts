@@ -3,7 +3,11 @@ import { useState } from 'react';
 
 interface UseTodoEditProps {
   todo: Todo;
-  onUpdate: (payload: { id: string; updates: Partial<Todo> }) => void;
+  onUpdate: (payload: {
+    id: string;
+    updates: Partial<Todo>;
+    date: string;
+  }) => void;
 }
 
 export default function useTodoEdit({ todo, onUpdate }: UseTodoEditProps) {
@@ -29,6 +33,7 @@ export default function useTodoEdit({ todo, onUpdate }: UseTodoEditProps) {
     onUpdate({
       id: todo.id,
       updates: { text: trimmed },
+      date: todo.date,
     });
     setIsEditing(false);
   };
