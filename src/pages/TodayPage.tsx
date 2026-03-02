@@ -12,7 +12,7 @@ import ReadOnlyMessage from '@/components/common/ReadOnlyMessage';
 import EmptyTodo from '@/components/common/EmptyTodo';
 import ErrorState from '@/components/common/ErrorState';
 import dayjs from 'dayjs';
-import { useTodo } from '@/hooks/queries/useTodo';
+import { useTodayTodos } from '@/hooks/queries/useTodayTodos';
 
 type ReadOnlyVariant = 'past' | 'future';
 
@@ -27,7 +27,7 @@ export default function TodayPage() {
     data: todosData = [],
     isLoading,
     isError,
-  } = useTodo(selectedDate, session?.user.id);
+  } = useTodayTodos(selectedDate, session?.user.id);
 
   const { formattedFocusTime, completionRate, completedCount, totalCount } =
     useDayDashboard({ todos: todosData, targetDate: selectedDate });

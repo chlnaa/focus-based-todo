@@ -4,7 +4,7 @@ import useDayDashboard from '@/hooks/useDayDashboard';
 import { DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { DialogDescription } from '@radix-ui/react-dialog';
 import { useSession } from '@/stores/session';
-import { useTodo } from '@/hooks/queries/useTodo';
+import { useHistoryTodos } from '@/hooks/queries/useHistoryTodos';
 
 interface HistoryDetailModalProps {
   date: string;
@@ -12,7 +12,7 @@ interface HistoryDetailModalProps {
 
 export default function HistoryDetailModal({ date }: HistoryDetailModalProps) {
   const session = useSession();
-  const { data: todos = [] } = useTodo(date!, session?.user.id);
+  const { data: todos = [] } = useHistoryTodos(date!, session?.user.id);
 
   const {
     todosData,
