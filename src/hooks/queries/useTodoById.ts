@@ -4,8 +4,10 @@ import { useQuery } from '@tanstack/react-query';
 
 export function useTodoById(id?: string) {
   return useQuery({
-    queryKey: id ? todoKeys.detail(id) : [],
+    queryKey: id ? todoKeys.byId(id) : [],
     queryFn: () => getTodoById(id!),
     enabled: !!id,
+    staleTime: 1000 * 60 * 3,
+    refetchOnWindowFocus: false,
   });
 }

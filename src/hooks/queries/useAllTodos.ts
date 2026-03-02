@@ -7,5 +7,6 @@ export function useAllTodos(userId?: string) {
     queryKey: userId ? todoKeys.allTodos(userId) : [],
     queryFn: () => getAllTodos(userId!),
     enabled: !!userId,
+    staleTime: 1000 * 60 * 10,
   });
 }

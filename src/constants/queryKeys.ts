@@ -3,7 +3,10 @@ export const todoKeys = {
 
   allTodos: (userId: string) => [...todoKeys.all, 'all', userId] as const,
 
-  byDate: (date: string) => [...todoKeys.all, 'date', date] as const,
+  dateRoot: () => [...todoKeys.all, 'date'] as const,
 
-  detail: (id: string) => [...todoKeys.all, 'detail', id] as const,
+  byDate: (date: string, userId: string) =>
+    [...todoKeys.all, 'date', date, userId] as const,
+
+  byId: (id: string) => [...todoKeys.all, 'item', id] as const,
 };
