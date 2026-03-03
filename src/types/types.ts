@@ -3,6 +3,10 @@ import type { Database } from '@/database.types';
 export type TodoEntity = Database['public']['Tables']['todo']['Row'];
 export type TodoInsert = Database['public']['Tables']['todo']['Insert'];
 
+export type FocusEntity = Database['public']['Tables']['focus_sessions']['Row'];
+export type FocusInsert =
+  Database['public']['Tables']['focus_sessions']['Insert'];
+
 export type TodoStatus = 'active' | 'completed';
 
 export interface Todo extends TodoEntity {}
