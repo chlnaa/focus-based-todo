@@ -10,3 +10,10 @@ export const todoKeys = {
 
   byId: (id: string) => [...todoKeys.all, 'item', id] as const,
 };
+
+export const focusKeys = {
+  all: (userId: string) => ['focus', userId] as const,
+
+  byDate: (userId: string, date: string) =>
+    [...focusKeys.all(userId), 'date', date] as const,
+};
