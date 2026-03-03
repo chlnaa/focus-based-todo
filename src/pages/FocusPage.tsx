@@ -2,25 +2,29 @@ import CustomDurationModal from '@/components/modal/CustomDurationModal';
 import { FocusStopModal } from '@/components/modal/FocusStopModal';
 import TimerCompletionModal from '@/components/modal/TimerCompletionModal';
 import { Button } from '@/components/ui/button';
+import { useCreateFocusSession } from '@/hooks/mutations/focus/useCreateFocusSession';
 import { useUpdateTodo } from '@/hooks/mutations/todo/useUpdateTodo';
 import { useTodoById } from '@/hooks/queries/useTodoById';
 import useTimer from '@/hooks/useTimer';
 import { formatTime } from '@/lib/utils';
+import { useSession } from '@/stores/session';
 import { useSelectedDate } from '@/stores/useTodoStore';
-import type { Todo } from '@/types/types';
 import { MoveLeft, Pause, Play, Square } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
 export default function FocusPage() {
   const selectedDate = useSelectedDate();
+  const session = useSession();
 
   const navigate = useNavigate();
   const { todoId } = useParams<{ todoId: string }>();
 
   const { data: currentTodo } = useTodoById(todoId);
-
   const { mutate: updateTodo } = useUpdateTodo();
+  const { mutate: createFocusSession } = useCreateFocusSession({
+    onSuccess: () => navigate('/'),
+  });
 
   const [isStopModalOpen, setIsStopModalOpen] = useState(false);
   const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false);
@@ -53,28 +57,38 @@ export default function FocusPage() {
   };
 
   const handleSaveAndExit = () => {
-    if (!todoId || !currentTodo) return;
+    if (!todoId || !currentTodo || !session?.user.id) return;
 
     const focusedSeconds = initialTime - timeLeft;
 
     if (focusedSeconds > 0) {
+      const now = new Date();
+      const startTime = new Date(now.getTime() - focusedSeconds * 1000);
+
       const newTotal = (currentTodo.total_focus_time ?? 0) + focusedSeconds;
-
-      const updates: Partial<Todo> = {
-        total_focus_time: newTotal,
-      };
-
-      if (timeLeft === 0 && currentTodo.status !== 'completed') {
-        updates.status = 'completed';
-      }
 
       updateTodo({
         id: todoId,
-        updates,
+        updates: {
+          total_focus_time: newTotal,
+          ...(timeLeft === 0 &&
+            currentTodo.status !== 'completed' && {
+              status: 'completed',
+            }),
+        },
         date: selectedDate,
       });
+
+      createFocusSession({
+        user_id: session.user.id,
+        todo_id: todoId,
+        start_time: startTime.toISOString(),
+        end_time: now.toISOString(),
+        duration: focusedSeconds,
+      });
+    } else {
+      navigate('/');
     }
-    navigate('/');
   };
 
   if (!currentTodo) return <div>No todo items found</div>;
