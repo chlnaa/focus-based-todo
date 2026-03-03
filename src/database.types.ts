@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      focus_sessions: {
+        Row: {
+          created_at: string | null
+          duration: number
+          end_time: string
+          id: string
+          start_time: string
+          todo_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          duration: number
+          end_time: string
+          id?: string
+          start_time: string
+          todo_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          duration?: number
+          end_time?: string
+          id?: string
+          start_time?: string
+          todo_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_focus_todo"
+            columns: ["todo_id"]
+            isOneToOne: false
+            referencedRelation: "todo"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       todo: {
         Row: {
           created_at: string
