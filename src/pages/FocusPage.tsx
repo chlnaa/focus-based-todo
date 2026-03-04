@@ -30,6 +30,8 @@ export default function FocusPage() {
   const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false);
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
 
+  const [previewTotal, setPreviewTotal] = useState(0);
+
   const {
     status,
     timeLeft,
@@ -40,7 +42,14 @@ export default function FocusPage() {
     resume,
   } = useTimer({
     initialSeconds: 1500,
-    onComplete: () => setIsCompletionModalOpen(true),
+    onComplete: (elapsedSeconds) => {
+      if (!currentTodo) return;
+
+      const total = (currentTodo.total_focus_time ?? 0) + elapsedSeconds;
+
+      setPreviewTotal(total);
+      setIsCompletionModalOpen(true);
+    },
   });
 
   const { hours, minutes, seconds } = formatTime(timeLeft);
@@ -59,36 +68,38 @@ export default function FocusPage() {
   const handleSaveAndExit = () => {
     if (!todoId || !currentTodo || !session?.user.id) return;
 
-    const focusedSeconds = initialTime - timeLeft;
+    const previousTotal = currentTodo.total_focus_time ?? 0;
+    const focusedSeconds = previewTotal - previousTotal;
 
-    if (focusedSeconds > 0) {
-      const now = new Date();
-      const startTime = new Date(now.getTime() - focusedSeconds * 1000);
-
-      const newTotal = (currentTodo.total_focus_time ?? 0) + focusedSeconds;
-
-      updateTodo({
-        id: todoId,
-        updates: {
-          total_focus_time: newTotal,
-          ...(timeLeft === 0 &&
-            currentTodo.status !== 'completed' && {
-              status: 'completed',
-            }),
-        },
-        date: selectedDate,
-      });
-
-      createFocusSession({
-        user_id: session.user.id,
-        todo_id: todoId,
-        start_time: startTime.toISOString(),
-        end_time: now.toISOString(),
-        duration: focusedSeconds,
-      });
-    } else {
+    if (focusedSeconds <= 0) {
       navigate('/');
+      return;
     }
+
+    setIsCompletionModalOpen(false);
+
+    const now = new Date();
+    const startTime = new Date(now.getTime() - focusedSeconds * 1000);
+
+    updateTodo({
+      id: todoId,
+      updates: {
+        total_focus_time: previewTotal,
+        ...(timeLeft === 0 &&
+          currentTodo.status !== 'completed' && {
+            status: 'completed',
+          }),
+      },
+      date: selectedDate,
+    });
+
+    createFocusSession({
+      user_id: session.user.id,
+      todo_id: todoId,
+      start_time: startTime.toISOString(),
+      end_time: now.toISOString(),
+      duration: focusedSeconds,
+    });
   };
 
   if (!currentTodo) return <div>No todo items found</div>;
@@ -181,9 +192,7 @@ export default function FocusPage() {
       <TimerCompletionModal
         open={isCompletionModalOpen}
         onConfirm={handleSaveAndExit}
-        total_focus_time={
-          formatTime(currentTodo.total_focus_time + initialTime).fullTimeDisplay
-        }
+        total_focus_time={formatTime(previewTotal).fullTimeDisplay}
       />
     </div>
   );
