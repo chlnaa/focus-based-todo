@@ -1,18 +1,17 @@
 import HistoryDetailModal from '@/components/modal/HistoryDetailModal';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
-import { formatTime, getDayStats } from '@/lib/utils';
-import type { Todo } from '@/types/types';
+import { formatTime } from '@/lib/utils';
+import type { HistoryStat } from '@/types/types';
 import { CircleCheck, Clock4 } from 'lucide-react';
 
 interface DayHistoryCardProps {
   date: string;
-  dayTodos: Todo[];
-  stats: ReturnType<typeof getDayStats>;
+  stats: HistoryStat;
 }
 
 export default function DayHistoryCard({
   date,
-  dayTodos,
+
   stats,
 }: DayHistoryCardProps) {
   return (
@@ -22,7 +21,7 @@ export default function DayHistoryCard({
           <header className="flex justify-between items-center text-lg">
             <div className="flex items-baseline gap-1.5">
               <span className="text-xl font-bold font-mono">{date}</span>
-              <span className="text-sm text-muted-foreground font-medium">{`(${stats.completedCount}/${dayTodos.length})`}</span>
+              <span className="text-sm text-muted-foreground font-medium">{`(${stats.completedCount}/${stats.totalCount})`}</span>
             </div>
             <div className="flex items-center gap-6 font-mono font-semibold">
               <div className="flex items-center gap-1.5 ">
@@ -31,7 +30,7 @@ export default function DayHistoryCard({
               </div>
               <div className="flex items-center gap-1.5">
                 <Clock4 className="w-4 h-4" />
-                {formatTime(stats.totalFocusSeconds).fullTimeDisplay}
+                {formatTime(stats.totalSeconds).fullTimeDisplay}
               </div>
             </div>
           </header>

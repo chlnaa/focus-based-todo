@@ -14,13 +14,17 @@ import TodoTextEditor from '@/components/common/TodoTextEditor';
 import AlertModal from '@/components/modal/AlertModal';
 import { useDeleteTodo } from '@/hooks/mutations/todo/useDeleteTodo';
 import { useUpdateTodo } from '@/hooks/mutations/todo/useUpdateTodo';
+import useTodoFocusTime from '@/hooks/queries/focus/useTodoFocusTime';
+import { useSession } from '@/stores/session';
 
 interface HistoryTodoRowProps {
   todo: Todo;
-  date: string;
 }
 
-export default function HistoryTodoRow({ todo, date }: HistoryTodoRowProps) {
+export default function HistoryTodoRow({ todo }: HistoryTodoRowProps) {
+  const session = useSession();
+  const userId = session?.user.id;
+
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const { mutate: deleteTodo } = useDeleteTodo();
@@ -35,7 +39,8 @@ export default function HistoryTodoRow({ todo, date }: HistoryTodoRowProps) {
     handleKeyDown,
   } = useTodoEdit({ todo, onUpdate: updateTodo });
 
-  const { id, status, total_focus_time } = todo;
+  const { id, status } = todo;
+  const { data: focusTime = 0 } = useTodoFocusTime(userId, todo.id);
 
   return (
     <li key={id} className="flex justify-between items-center px-5 py-2">
@@ -51,7 +56,7 @@ export default function HistoryTodoRow({ todo, date }: HistoryTodoRowProps) {
 
         {!isEditing && (
           <span className="ml-3 font-mono text-sm">
-            {formatTime(total_focus_time || 0).fullTimeDisplay}
+            {formatTime(focusTime).fullTimeDisplay}
           </span>
         )}
       </div>
