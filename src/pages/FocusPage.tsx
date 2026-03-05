@@ -4,6 +4,7 @@ import TimerCompletionModal from '@/components/modal/TimerCompletionModal';
 import { Button } from '@/components/ui/button';
 import { useCreateFocusSession } from '@/hooks/mutations/focus/useCreateFocusSession';
 import { useUpdateTodo } from '@/hooks/mutations/todo/useUpdateTodo';
+import useTodoFocusTime from '@/hooks/queries/focus/useTodoFocusTime';
 import { useTodoById } from '@/hooks/queries/useTodoById';
 import useTimer from '@/hooks/useTimer';
 import { formatTime } from '@/lib/utils';
@@ -16,11 +17,14 @@ import { useNavigate, useParams } from 'react-router';
 export default function FocusPage() {
   const selectedDate = useSelectedDate();
   const session = useSession();
+  const userId = session?.user.id;
 
   const navigate = useNavigate();
   const { todoId } = useParams<{ todoId: string }>();
 
   const { data: currentTodo } = useTodoById(todoId);
+  const { data: totalFocus = 0 } = useTodoFocusTime(userId, todoId);
+
   const { mutate: updateTodo } = useUpdateTodo();
   const { mutate: createFocusSession } = useCreateFocusSession({
     onSuccess: () => navigate('/'),
@@ -43,11 +47,7 @@ export default function FocusPage() {
   } = useTimer({
     initialSeconds: 1500,
     onComplete: (elapsedSeconds) => {
-      if (!currentTodo) return;
-
-      const total = (currentTodo.total_focus_time ?? 0) + elapsedSeconds;
-
-      setPreviewTotal(total);
+      setPreviewTotal(elapsedSeconds);
       setIsCompletionModalOpen(true);
     },
   });
@@ -68,30 +68,15 @@ export default function FocusPage() {
   const handleSaveAndExit = () => {
     if (!todoId || !currentTodo || !session?.user.id) return;
 
-    const previousTotal = currentTodo.total_focus_time ?? 0;
-    const focusedSeconds = previewTotal - previousTotal;
+    const focusedSeconds = previewTotal;
 
     if (focusedSeconds <= 0) {
       navigate('/');
       return;
     }
 
-    setIsCompletionModalOpen(false);
-
     const now = new Date();
     const startTime = new Date(now.getTime() - focusedSeconds * 1000);
-
-    updateTodo({
-      id: todoId,
-      updates: {
-        total_focus_time: previewTotal,
-        ...(timeLeft === 0 &&
-          currentTodo.status !== 'completed' && {
-            status: 'completed',
-          }),
-      },
-      date: selectedDate,
-    });
 
     createFocusSession({
       user_id: session.user.id,
@@ -100,6 +85,14 @@ export default function FocusPage() {
       end_time: now.toISOString(),
       duration: focusedSeconds,
     });
+
+    if (timeLeft === 0 && currentTodo?.status !== 'completed') {
+      updateTodo({
+        id: todoId,
+        updates: { status: 'completed' },
+        date: selectedDate,
+      });
+    }
   };
 
   if (!currentTodo) return <div>No todo items found</div>;
@@ -173,7 +166,7 @@ export default function FocusPage() {
 
         <div className="flex gap-3">
           <div className="text-muted-foreground">Total Focus Time</div>
-          <div>{formatTime(currentTodo.total_focus_time).fullTimeDisplay}</div>
+          <div>{formatTime(totalFocus).fullTimeDisplay}</div>
         </div>
       </footer>
 
@@ -192,7 +185,7 @@ export default function FocusPage() {
       <TimerCompletionModal
         open={isCompletionModalOpen}
         onConfirm={handleSaveAndExit}
-        total_focus_time={formatTime(previewTotal).fullTimeDisplay}
+        totalFocusDisplay={formatTime(previewTotal).fullTimeDisplay}
       />
     </div>
   );
