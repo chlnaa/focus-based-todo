@@ -1,32 +1,31 @@
-import { formatTime, getDayStats } from '@/lib/utils';
+import { formatTime } from '@/lib/utils';
 import type { Todo } from '@/types/types';
 import { useMemo } from 'react';
 
 interface UseDayDashboardProps {
   todos: Todo[];
-  targetDate: string;
+  totalFocusSeconds: number;
 }
 
 export default function useDayDashboard({
   todos,
-  targetDate,
+  totalFocusSeconds,
 }: UseDayDashboardProps) {
-  const todosData = useMemo(
-    () => todos.filter((todo) => todo.date === targetDate),
-    [todos, targetDate],
-  );
+  const totalCount = todos.length;
 
-  const stats = useMemo(() => getDayStats(todosData), [todosData]);
-  const formattedFocusTime = useMemo(
-    () => formatTime(stats.totalFocusSeconds).fullTimeDisplay,
-    [stats.totalFocusSeconds],
-  );
+  const completedCount = todos.filter(
+    (todo) => todo.status === 'completed',
+  ).length;
+
+  const completionRate =
+    totalCount > 0 ? Math.floor((completedCount / totalCount) * 100) : 0;
+
+  const formattedFocusTime = formatTime(totalFocusSeconds).fullTimeDisplay;
 
   return {
-    todosData,
+    totalCount,
+    completionRate,
+    completedCount,
     formattedFocusTime,
-    completionRate: stats.completionRate,
-    completedCount: stats.completedCount || 0,
-    totalCount: stats.totalCount,
   };
 }

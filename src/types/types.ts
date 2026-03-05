@@ -23,3 +23,11 @@ export type UseMutationCallback = {
   onMutate?: () => void;
   onSettled?: () => void;
 };
+
+export interface HistoryStat {
+  date: string;
+  totalSeconds: number;
+  totalCount: number;
+  completedCount: number;
+  completionRate: number;
+}
