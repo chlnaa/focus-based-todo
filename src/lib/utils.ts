@@ -21,31 +21,6 @@ export const formatTime = (totalSeconds: number) => {
   return { fullTimeDisplay, hours, minutes, seconds };
 };
 
-export const getDayStats = (dayTodos: Todo[]) => {
-  const totalCount = dayTodos.length;
-
-  const totalFocusSeconds = dayTodos.reduce(
-    (acc, todo) => acc + (todo.total_focus_time || 0),
-    0,
-  );
-
-  const completedCount = dayTodos.filter(
-    (todo) => todo.status === 'completed',
-  ).length;
-
-  const completionRate =
-    dayTodos.length > 0
-      ? Math.floor((completedCount / dayTodos.length) * 100)
-      : 0;
-
-  return {
-    totalCount,
-    totalFocusSeconds,
-    completionRate,
-    completedCount,
-  };
-};
-
 export const isToday = (date: string | Date | number): boolean => {
   return dayjs(date).isSame(dayjs(), 'day');
 };
