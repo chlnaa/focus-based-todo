@@ -1,38 +1,30 @@
 import dayjs from 'dayjs';
-import { getDayStats } from '@/lib/utils';
-import type { ChartData, Todo } from '@/types/types';
-
-type TodosByDateMap = Record<string, Todo[]>;
+import type { ChartData, HistoryStat } from '@/types/types';
 
 export default function prepareChartData(
-  todosByDate: TodosByDateMap,
+  historyStats: HistoryStat[],
 ): ChartData[] {
-  const existingEntries = Object.entries(todosByDate)
-    .map(([dateStr, todos]) => ({
-      dateStr,
-      stats: getDayStats(todos),
-    }))
-    .sort((a, b) => (dayjs(a.dateStr).isAfter(dayjs(b.dateStr)) ? 1 : -1));
+  if (historyStats.length === 0) return [];
 
-  if (existingEntries.length === 0) return [];
+  const sorted = [...historyStats].sort((a, b) =>
+    dayjs(a.date).isAfter(dayjs(b.date)) ? 1 : -1,
+  );
 
-  const firstDate = dayjs(existingEntries[0].dateStr);
-  const lastDate = dayjs(existingEntries[existingEntries.length - 1].dateStr);
+  const firstDate = dayjs(sorted[0].date);
+  const lastDate = dayjs(sorted[sorted.length - 1].date);
 
   const filledData: ChartData[] = [];
   let runner = firstDate;
 
   while (runner.isBefore(lastDate) || runner.isSame(lastDate, 'day')) {
     const currentFormatted = runner.format('YYYY-MM-DD');
-    const foundEntry = existingEntries.find(
-      (e) => e.dateStr === currentFormatted,
-    );
+    const foundEntry = sorted.find((e) => e.date === currentFormatted);
 
     if (foundEntry) {
       filledData.push({
         date: runner.toDate(),
-        completionRate: foundEntry.stats.completionRate,
-        totalMinutes: Math.floor(foundEntry.stats.totalFocusSeconds / 60),
+        completionRate: foundEntry.completionRate,
+        totalMinutes: Math.floor(foundEntry.totalSeconds / 60),
       });
     } else {
       filledData.push({

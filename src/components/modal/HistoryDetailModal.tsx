@@ -5,6 +5,7 @@ import { DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { DialogDescription } from '@radix-ui/react-dialog';
 import { useSession } from '@/stores/session';
 import { useHistoryTodos } from '@/hooks/queries/useHistoryTodos';
+import useTodayFocusTime from '@/hooks/queries/focus/useTodayFocusTime';
 
 interface HistoryDetailModalProps {
   date: string;
@@ -12,15 +13,13 @@ interface HistoryDetailModalProps {
 
 export default function HistoryDetailModal({ date }: HistoryDetailModalProps) {
   const session = useSession();
-  const { data: todos = [] } = useHistoryTodos(date!, session?.user.id);
+  const userId = session?.user.id;
 
-  const {
-    todosData,
-    formattedFocusTime,
-    completionRate,
-    completedCount,
-    totalCount,
-  } = useDayDashboard({ todos, targetDate: date! });
+  const { data: todos = [] } = useHistoryTodos(date!, userId);
+  const { data: focusSeconds = 0 } = useTodayFocusTime(userId ?? '', date);
+
+  const { formattedFocusTime, completionRate, completedCount, totalCount } =
+    useDayDashboard({ todos, totalFocusSeconds: focusSeconds });
 
   return (
     <DialogContent className="max-w-[90vw] md:max-w-2xl w-full max-h-[85vh] overflow-y-auto border-2 rounded-4xl p-4 sm:p-8 ">
@@ -43,8 +42,8 @@ export default function HistoryDetailModal({ date }: HistoryDetailModalProps) {
       </div>
 
       <ul className="space-y-4">
-        {todosData.map((todo) => (
-          <HistoryTodoRow key={todo.id} todo={todo} date={date} />
+        {todos.map((todo) => (
+          <HistoryTodoRow key={todo.id} todo={todo} />
         ))}
       </ul>
     </DialogContent>

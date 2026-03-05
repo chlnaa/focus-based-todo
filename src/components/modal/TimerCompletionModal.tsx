@@ -11,13 +11,13 @@ import { Button } from '../ui/button';
 interface TimerCompletionModalProps {
   open: boolean;
   onConfirm: () => void;
-  total_focus_time: string;
+  totalFocusDisplay: string;
 }
 
 export default function TimerCompletionModal({
   open,
   onConfirm,
-  total_focus_time: total_focus_time,
+  totalFocusDisplay,
 }: TimerCompletionModalProps) {
   return (
     <Dialog open={open}>
@@ -27,7 +27,7 @@ export default function TimerCompletionModal({
             Focus Complete!⭐️
           </DialogTitle>
           <DialogDescription className="text-center pt-4 text-lg">
-            You’ve completed **{total_focus_time}** of deep work. Ready to save
+            You’ve completed **{totalFocusDisplay}** of deep work. Ready to save
             and head back?
           </DialogDescription>
         </DialogHeader>

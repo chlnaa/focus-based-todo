@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router';
 import AlertModal from '@/components/modal/AlertModal';
 import TodoTextEditor from '@/components/common/TodoTextEditor';
 import useTodoEdit from '@/hooks/useTodoEdit';
+import useTodoFocusTime from '@/hooks/queries/focus/useTodoFocusTime';
+import { useSession } from '@/stores/session';
 
 interface TodoItemProps {
   todo: Todo;
@@ -20,9 +22,12 @@ interface TodoItemProps {
 }
 
 export default function TodoItems({ todo, onDelete, onUpdate }: TodoItemProps) {
+  const session = useSession();
+  const userId = session?.user.id;
   const navigate = useNavigate();
 
-  const { id, status, total_focus_time, date } = todo;
+  const { id, status, date } = todo;
+  const { data: focusSeconds = 0 } = useTodoFocusTime(userId, id);
 
   const isReadOnly = !isToday(date);
 
@@ -103,9 +108,7 @@ export default function TodoItems({ todo, onDelete, onUpdate }: TodoItemProps) {
         </div>
       </div>
       <div className="flex justify-end items-center w-full">
-        <div className="mr-5">
-          {formatTime(total_focus_time || 0).fullTimeDisplay}
-        </div>
+        <div className="mr-5">{formatTime(focusSeconds).fullTimeDisplay}</div>
         <Button
           onClick={() => navigate(`/focus/${id}`)}
           disabled={todo.status === 'completed' || isReadOnly}

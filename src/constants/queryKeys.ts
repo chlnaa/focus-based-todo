@@ -12,8 +12,18 @@ export const todoKeys = {
 };
 
 export const focusKeys = {
-  all: (userId: string) => ['focus', userId] as const,
+  root: ['focus'] as const,
+
+  all: (userId: string) => [...focusKeys.root, userId] as const,
+
+  daily: (userId: string, from: string, to: string) =>
+    [...focusKeys.all(userId), 'daily', from, to] as const,
 
   byDate: (userId: string, date: string) =>
     [...focusKeys.all(userId), 'date', date] as const,
+
+  total: (userId: string) => [...focusKeys.all(userId), 'total'] as const,
+
+  todo: (userId: string, todoId: string) =>
+    [...focusKeys.all(userId), 'todo', todoId] as const,
 };

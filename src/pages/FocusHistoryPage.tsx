@@ -4,7 +4,6 @@ import DateNavigationHeader from '@/components/common/DateNavigationHeader';
 import FocusTimeBarChart from '@/features/history/FocusTimeBarChart';
 import FocusTrendChart from '@/features/history/FocusTrendChart';
 import useWeekNavigation from '@/hooks/useWeekNavigation';
-import { getDayStats } from '@/lib/utils';
 import { useSelectedDate } from '@/stores/useTodoStore';
 import type { Todo } from '@/types/types';
 import dayjs from 'dayjs';
@@ -13,6 +12,8 @@ import FocusHistoryLoading from '@/components/skeleton/FocusHistoryLoading';
 import ErrorState from '@/components/common/ErrorState';
 import { useSession } from '@/stores/session';
 import { useAllTodos } from '@/hooks/queries/useAllTodos';
+import { useDailyAggregation } from '@/hooks/queries/focus/useDailyAggregation';
+import { useHistoryDashboard } from '@/hooks/useHistoryDashboard';
 
 export default function FocusHistoryPage() {
   const session = useSession();
@@ -20,22 +21,31 @@ export default function FocusHistoryPage() {
   const [historyBaseDate, setHistoryBaseDate] = useState(selectedDate);
 
   const userId = session?.user.id;
-  const { data: historyTodos = [], isLoading, isError } = useAllTodos(userId);
 
   const { baseDate, currentMonth, getPrevWeekDate, getNextWeekDate } =
     useWeekNavigation({ currentDate: historyBaseDate, allowFuture: false });
 
-  const todosByDate = useMemo(
-    () => groupTodosByDate(historyTodos),
-    [historyTodos],
-  );
+  const from = baseDate.startOf('week').format('YYYY-MM-DD');
+  const to = baseDate.endOf('week').format('YYYY-MM-DD');
 
-  const sortedDates = useMemo(
-    () => Object.keys(todosByDate).sort((a, b) => b.localeCompare(a)),
-    [todosByDate],
-  );
+  const {
+    data: historyTodos = [],
+    isLoading: todosLoading,
+    isError: todosError,
+  } = useAllTodos(userId);
 
-  const chartData = useMemo(() => prepareChartData(todosByDate), [todosByDate]);
+  const {
+    data: dailyFocus = [],
+    isLoading: focusLoading,
+    isError: focusError,
+  } = useDailyAggregation(userId, from, to);
+
+  const historyStats = useHistoryDashboard(historyTodos, dailyFocus);
+
+  const chartData = useMemo(
+    () => prepareChartData(historyStats),
+    [historyStats],
+  );
 
   const weeklyData = useMemo(() => {
     const start = baseDate.startOf('day');
@@ -60,8 +70,10 @@ export default function FocusHistoryPage() {
   const nextWeekDate = getNextWeekDate();
   const isNextDisabled = !nextWeekDate;
 
-  if (isLoading) return <FocusHistoryLoading />;
-  if (isError) return <ErrorState message="Failed to load today's data." />;
+  if (todosLoading || focusLoading) return <FocusHistoryLoading />;
+
+  if (todosError || focusError)
+    return <ErrorState message="Failed to load history data." />;
 
   return (
     <div className="flex flex-col gap-3">
@@ -81,22 +93,9 @@ export default function FocusHistoryPage() {
         </div>
       </div>
 
-      {sortedDates.map((date) => (
-        <DayHistoryCard
-          key={date}
-          date={date}
-          dayTodos={todosByDate[date]}
-          stats={getDayStats(todosByDate[date])}
-        />
+      {historyStats.map((stat) => (
+        <DayHistoryCard key={stat.date} date={stat.date} stats={stat} />
       ))}
     </div>
   );
 }
-
-const groupTodosByDate = (todos: Todo[]): Record<string, Todo[]> =>
-  todos.reduce<Record<string, Todo[]>>((acc, todo) => {
-    const dateKey = todo.date;
-    if (!acc[dateKey]) acc[dateKey] = [];
-    acc[dateKey].push(todo);
-    return acc;
-  }, {});

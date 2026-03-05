@@ -13,6 +13,7 @@ import EmptyTodo from '@/components/common/EmptyTodo';
 import ErrorState from '@/components/common/ErrorState';
 import dayjs from 'dayjs';
 import { useTodayTodos } from '@/hooks/queries/useTodayTodos';
+import useTodayFocusTime from '@/hooks/queries/focus/useTodayFocusTime';
 
 type ReadOnlyVariant = 'past' | 'future';
 
@@ -29,8 +30,16 @@ export default function TodayPage() {
     isError,
   } = useTodayTodos(selectedDate, session?.user.id);
 
+  const { data: totalFocusSeconds = 0 } = useTodayFocusTime(
+    session?.user.id ?? '',
+    selectedDate,
+  );
+
   const { formattedFocusTime, completionRate, completedCount, totalCount } =
-    useDayDashboard({ todos: todosData, targetDate: selectedDate });
+    useDayDashboard({
+      todos: todosData,
+      totalFocusSeconds,
+    });
 
   const isPast = dayjs(selectedDate).isBefore(dayjs(), 'day');
   const isFuture = dayjs(selectedDate).isAfter(dayjs(), 'day');
