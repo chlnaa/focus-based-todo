@@ -12,13 +12,11 @@ export function useCreateFocusSession(callbacks?: UseMutationCallback) {
   return useMutation({
     mutationFn: createFocusSession,
 
-    onSuccess: async (newSession) => {
+    onSuccess: async () => {
       if (!userId) return;
 
-      const dateKey = newSession.start_time.split('T')[0];
-
       await queryClient.invalidateQueries({
-        queryKey: focusKeys.byDate(userId, dateKey),
+        queryKey: focusKeys.root,
       });
 
       callbacks?.onSuccess?.();
