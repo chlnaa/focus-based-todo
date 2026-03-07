@@ -1,26 +1,30 @@
-# 📝 Focusdo App
+# 📝 Focusdo App — Focus Timer & Productivity Analytics
 
 [English] | [한국어](./README.ko.md) | [日本語](./README.ja.md)
 
 ---
 
-A productivity application that combines daily todo management with a focus timer.  
-This project focuses on clear state ownership, predictable UI flows, and a scalable front-end architecture.
+FocustDo is a productivity web application that combines task management with focus session tracking and analytics.
 
-Designed for users who want to manage daily tasks with intentional focus,
-instead of juggling multiple fragmented productivity tools.
+The system records focus sessions as raw data in the `focus_sessions` table.
+Instead of storing aggregated values, analytics are derived dynamically from session data.
+
+Session records are fetched from Supabase and aggregated on the client using React Query hooks.
+Analytics data is then combined with todo statistics and visualized using D3 charts.
+
+This architecture avoids duplicated writes and separates the focus tracking domain from analytics and visualization layers.
 
 ---
 
 ## ✨ Features
 
-- 📅 Date-based todo management
-- ⏱️ Focus timer with preset and custom durations
-- 🧠 Automatic focus time accumulation per task
-- 🚫 Read-only mode for past and future dates
-- 📊 Daily dashboard (completion rate, total focus time, completed tasks)
-- 📈 Focus history view (daily / weekly)
-- ⚠️ Explicit Loading / Empty / Error UI states
+- ⏱️ Focus Timer
+- 📝 Todo Management
+- 📊 Daily Productivity Dashboard
+- 📈 Weekly Focus Time Analytics
+- 🗂️ Focus Session History
+- 📉 Data Visualization with D3
+- ⚡ Data Fetching & Caching with React Query
 
 ---
 
@@ -40,20 +44,49 @@ instead of juggling multiple fragmented productivity tools.
 
 ## 🛠️ Tech Stack
 
+Frontend
+
 - **React + TypeScript**
-- **Zustand** — global state management
-- **TanStack Query** — async state handling
+
+Routing
+
 - **React Router**
+
+State Management
+
+- **Zustand**
+
+Server State
+
+- **TanStack Query**
+
+Backend / Database
+
+- **Supabase (PostgreSQL)**
+
+Data Visualization
+
+- **D3.js**
+
+Styling
+
 - **Tailwind CSS**
-- **shadcn/ui** — accessible UI components
-- **Day.js** — date utilities
+- **shadcn/ui**
+
+Date Library
+
+- **Day.js**
 
 ---
 
-## 🧩 Architecture Notes
+## 📊 Architecture Notes
 
-State flows are intentionally unidirectional:
-user interaction → page orchestration → store mutation → derived UI.
+The application separates data fetching, analytics computation, and visualization.
+Focus sessions are stored as raw records and analytics are computed dynamically.
+
+---
+
+## 🏗 Architecture Principles
 
 - **Page-level orchestration**  
   Page components do not implement domain logic directly.  
@@ -71,6 +104,79 @@ user interaction → page orchestration → store mutation → derived UI.
 
 ---
 
+## 🔄 Data Flow
+
+```
+Todo Created (Today Page)
+        ↓
+Focus Timer (Focus Page)
+        ↓
+Focus Session Stored
+        ↓
+Supabase Database (focus_sessions)
+        ↓
+React Query Data Hooks
+(useDailyAggregation)
+        ↓
+Client-side Aggregation
+        ↓
+Analytics Hooks
+(useHistoryDashboard)
+        ↓
+Visualization Layer
+(D3 Charts + Dashboard UI)
+```
+
+---
+
+## 🧩 Analytics Layers
+
+The analytics system is structured into three layers:
+
+Data Fetch Layer
+
+- `useDailyAggregation`
+- Fetches session data from Supabase and aggregates focus time.
+
+Analytics Layer
+
+- `useHistoryDashboard`
+- Combines focus statistics with todo completion data.
+
+Visualization Layer
+
+- `FocusTrendChart`
+- `FocusTimeBarChart`
+- `DayHistoryCard`
+
+Charts are implemented using D3.js.
+
+---
+
+## 📂 Project Structure
+
+```
+src
+ ├ api
+ ├ components
+ ├ constants
+ ├ features
+ │   ├ dashboard
+ │   ├ date
+ │   ├ history
+ │   └ todo
+ ├ hooks
+ ├ lib
+ ├ pages
+ └ provider
+ └ store
+ └ types
+```
+
+Domain logic is separated from UI components to improve scalability and maintainability.
+
+---
+
 ## 🧠 Design Decisions
 
 - Read-only dates are modeled as an explicit UI state to prevent misleading interactions.
@@ -79,7 +185,7 @@ user interaction → page orchestration → store mutation → derived UI.
 
 ---
 
-## ⚖️ Known Trade-offs
+## ⚖️ Trade-offs
 
 - All data is currently stored in memory for faster iteration.
 - Focus history visualization prioritizes clarity over performance at scale.
@@ -96,24 +202,16 @@ npm run dev
 
 ---
 
-## 📌 Pre-release Scope
-
-The following features are intentionally excluded in the initial release:
-
-- Backend integration
-- Authentication
-- Persistent storage
-
-These will be introduced incrementally after deployment.
-
----
-
 ## 📈 Future Improvements
 
 - List virtualization or infinite scroll
-- Persistent storage or backend sync
+- ~~Persistent storage or backend sync~~
 - Extended focus analytics
 - Further mobile UX refinements
+- Dark mode support
+- Database view-based aggregation
+- Query performance optimization with indexes
+- Timer session recovery
 
 ---
 
