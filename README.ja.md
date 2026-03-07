@@ -1,28 +1,30 @@
-# 📝 Focusdo App
+# 📝 Focusdo App — 集中タイマー & 生産性分析アプリ
 
 [English](./README.md) | [한국어](./README.ko.md) | [日本語]
 
 ---
 
-日々のTodo管理と集中タイマーを組み合わせた
-生産性向上のためのアプリケーションです。  
-状態の責務を明確に分離し、予測可能なUIフローと
-拡張性のあるフロントエンド構成を重視して設計しています。
+FocusDo はタスク管理と集中セッション記録を組み合わせた生産性アプリケーションです。
 
-断片的な生産性ツールを行き来するのではなく、  
-「意図的な集中」を軸に日々のタスクを管理したいユーザーを想定しています。
+集中時間は `focus_sessions` テーブルにセッション単位の raw データとして保存されます。
+統計データは別途保存せず、セッションデータから動的に計算されます。
+
+セッションデータは Supabase から取得され、React Query フックによってクライアント側で aggregation が実行されます。
+その後 Todo データと結合され、D3 チャートで可視化されます。
+
+この構造により dual write を防ぎ、データ取得・分析・可視化のレイヤーを分離しています。
 
 ---
 
 ## ✨ 主な機能
 
-- 📅 日付ベースのTodo管理
-- ⏱️ プリセットおよびカスタム集中タイマー
-- 🧠 タスクごとの集中時間自動累積
-- 🚫 過去 / 未来の日付に対する読み取り専用モード
-- 📊 日次ダッシュボード（完了率、総集中時間、完了タスク数）
-- 📈 集中履歴ビュー（日次 / 週次）
-- ⚠️ Loading / Empty / Error UI状態の明示的な処理
+- ⏱️ 集中タイマー
+- 📝 Todo 管理
+- 📊 デイリー生産性ダッシュボード
+- 📈 週間集中時間分析
+- 🗂️ 集中記録ヒストリー
+- 📉 D3によるデータ可視化
+- ⚡ React Queryによるデータキャッシュ
 
 ---
 
@@ -43,20 +45,50 @@
 
 ## 🛠️ 技術スタック
 
+Frontend
+
 - **React + TypeScript**
-- **Zustand** — グローバル状態管理
-- **TanStack Query** — 非同期状態・ローディング / エラー処理
+
+Routing
+
 - **React Router**
+
+State Management
+
+- **Zustand**
+
+Server State
+
+- **TanStack Query**
+
+Backend / Database
+
+- **Supabase (PostgreSQL)**
+
+Data Visualization
+
+- **D3.js**
+
+Styling
+
 - **Tailwind CSS**
-- **shadcn/ui** — アクセシビリティを考慮したUIコンポーネント
-- **Day.js** — 日付ユーティリティ
+- **shadcn/ui**
+
+Date Library
+
+- **Day.js**
 
 ---
 
-## 🧩 アーキテクチャ設計
+## 📊 アーキテクチャ設計
 
-状態の流れは以下のように一方向で構成されています。  
-ユーザー操作 → ページオーケストレーション → ストア更新 → 派生UI描画
+本アプリケーションはデータ取得・分析計算・可視化レイヤーに分離された構造です。
+
+集中時間はセッションデータとして保存され、統計データは動的に計算されます。
+
+---
+
+## 🏗 アーキテクチャ原則
 
 - **ページ単位のオーケストレーション**  
   ページコンポーネントはドメインロジックを直接持たず、  
@@ -75,6 +107,79 @@
 
 ---
 
+## 🔄 データフロー
+
+```
+TodayページでTodo作成
+        ↓
+FocusページでTimer実行
+        ↓
+Focus Session保存
+        ↓
+Supabase Database (focus_sessions)
+        ↓
+React Query Data Hooks
+(useDailyAggregation)
+        ↓
+Client Aggregation
+        ↓
+Analytics Hooks
+(useHistoryDashboard)
+        ↓
+Visualization Layer
+(D3 Charts + Dashboard UI)
+```
+
+---
+
+## 🧩 Analytics構造
+
+分析システムは三つのレイヤーで構成されています。
+
+Data Fetch Layer
+
+- `useDailyAggregation`
+- Supabaseからセッションデータを取得し日別集中時間を計算
+
+Analytics Layer
+
+- `useHistoryDashboard`
+- 集中時間データとTodo完了データを統合
+
+Visualization Layer
+
+- `FocusTrendChart`
+- `FocusTimeBarChart`
+- `DayHistoryCard`
+
+チャートは D3.js で実装されています。
+
+---
+
+## 📂 プロジェクト構造
+
+```
+src
+ ├ api
+ ├ components
+ ├ constants
+ ├ features
+ │   ├ dashboard
+ │   ├ date
+ │   ├ history
+ │   └ todo
+ ├ hooks
+ ├ lib
+ ├ pages
+ └ provider
+ └ store
+ └ types
+```
+
+ドメインロジックとUIコンポーネントを分離し、拡張性と保守性を考慮した構造です。
+
+---
+
 ## 🧠 デザイン上の判断
 
 - 読み取り専用の日付は明示的なUI状態として扱い、
@@ -86,7 +191,7 @@
 
 ---
 
-## ⚖️ 既知のトレードオフ
+## ⚖️ トレードオフ
 
 - データは現在メモリ上で管理されています。
 - 集中履歴の可視化は、大規模データでの性能より
@@ -105,24 +210,16 @@ npm run dev
 
 ---
 
-## 📌 初期リリース範囲
-
-以下の機能は初期リリースでは意図的に含めていません。
-
-- バックエンド連携
-- 認証機能
-- 永続ストレージ
-
-これらはデプロイ後、段階的に追加予定です。
-
----
-
 ## 📈 今後の改善予定
 
 - リストの仮想化または無限スクロール
-- 永続ストレージまたはバックエンド同期
+- ~~永続ストレージまたはバックエンド同期~~
 - 集中データの高度な分析
 - モバイルUXのさらなる改善
+- ダークモード
+- DB View ベース aggregation
+- DB インデックス最適化
+- タイマーセッション復元
 
 ---
 
