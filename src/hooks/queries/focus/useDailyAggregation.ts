@@ -7,11 +7,11 @@ export interface DailyAggregation {
   totalSeconds: number;
 }
 
-export const useDailyAggregation = (
+export default function useDailyAggregation(
   userId?: string,
   from?: string,
   to?: string,
-) => {
+) {
   return useQuery({
     queryKey: userId && from && to ? focusKeys.daily(userId, from, to) : [],
 
@@ -28,4 +28,4 @@ export const useDailyAggregation = (
 
     enabled: !!userId && !!from && !!to,
   });
-};
+}

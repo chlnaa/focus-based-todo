@@ -10,9 +10,9 @@ import { useMemo, useState } from 'react';
 import FocusHistoryLoading from '@/components/skeleton/FocusHistoryLoading';
 import ErrorState from '@/components/common/ErrorState';
 import { useSession } from '@/stores/session';
-import { useAllTodos } from '@/hooks/queries/useAllTodos';
-import { useDailyAggregation } from '@/hooks/queries/focus/useDailyAggregation';
-import { useHistoryDashboard } from '@/hooks/useHistoryDashboard';
+import useAllTodos from '@/hooks/queries/todo/useAllTodos';
+import useDailyAggregation from '@/hooks/queries/focus/useDailyAggregation';
+import useHistoryDashboard from '@/hooks/useHistoryDashboard';
 
 export default function FocusHistoryPage() {
   const session = useSession();

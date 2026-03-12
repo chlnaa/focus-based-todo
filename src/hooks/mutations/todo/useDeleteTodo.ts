@@ -4,7 +4,7 @@ import type { TodoEntity, UseMutationCallback } from '@/types/types';
 import { todoKeys } from '@/constants/queryKeys';
 import { useSession } from '@/stores/session';
 
-export function useDeleteTodo(callbacks?: UseMutationCallback) {
+export default function useDeleteTodo(callbacks?: UseMutationCallback) {
   const queryClient = useQueryClient();
   const session = useSession();
   const userId = session?.user.id;

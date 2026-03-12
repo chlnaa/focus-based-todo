@@ -12,8 +12,8 @@ import { useState } from 'react';
 import useTodoEdit from '@/hooks/useTodoEdit';
 import TodoTextEditor from '@/components/common/TodoTextEditor';
 import AlertModal from '@/components/modal/AlertModal';
-import { useDeleteTodo } from '@/hooks/mutations/todo/useDeleteTodo';
-import { useUpdateTodo } from '@/hooks/mutations/todo/useUpdateTodo';
+import useDeleteTodo from '@/hooks/mutations/todo/useDeleteTodo';
+import useUpdateTodo from '@/hooks/mutations/todo/useUpdateTodo';
 import useTodoFocusTime from '@/hooks/queries/focus/useTodoFocusTime';
 import { useSession } from '@/stores/session';
 

@@ -1,7 +1,7 @@
 import type { Todo } from '@/types/types';
 import TodoItems from './TodoItems';
-import { useDeleteTodo } from '@/hooks/mutations/todo/useDeleteTodo';
-import { useUpdateTodo } from '@/hooks/mutations/todo/useUpdateTodo';
+import useDeleteTodo from '@/hooks/mutations/todo/useDeleteTodo';
+import useUpdateTodo from '@/hooks/mutations/todo/useUpdateTodo';
 
 interface TodolistProps {
   filteredTodos: Todo[];

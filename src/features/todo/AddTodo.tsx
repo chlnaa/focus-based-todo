@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useCreateTodo } from '@/hooks/mutations/todo/useCreateTodo';
+import useCreateTodo from '@/hooks/mutations/todo/useCreateTodo';
 import { useSession } from '@/stores/session';
 import { useState } from 'react';
 
