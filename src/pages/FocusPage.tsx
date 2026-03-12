@@ -1,5 +1,5 @@
 import CustomDurationModal from '@/components/modal/CustomDurationModal';
-import { FocusStopModal } from '@/components/modal/FocusStopModal';
+import FocusStopModal from '@/components/modal/FocusStopModal';
 import TimerCompletionModal from '@/components/modal/TimerCompletionModal';
 import { Button } from '@/components/ui/button';
 import { useCreateFocusSession } from '@/hooks/mutations/focus/useCreateFocusSession';

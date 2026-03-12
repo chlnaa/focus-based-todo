@@ -5,7 +5,6 @@ import FocusTimeBarChart from '@/features/history/FocusTimeBarChart';
 import FocusTrendChart from '@/features/history/FocusTrendChart';
 import useWeekNavigation from '@/hooks/useWeekNavigation';
 import { useSelectedDate } from '@/stores/useTodoStore';
-import type { Todo } from '@/types/types';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 import FocusHistoryLoading from '@/components/skeleton/FocusHistoryLoading';

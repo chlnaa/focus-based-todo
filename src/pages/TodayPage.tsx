@@ -7,7 +7,7 @@ import TodoList from '@/features/todo/TodoList';
 import useDayDashboard from '@/hooks/useDayDashboard';
 import AddTodo from '@/features/todo/AddTodo';
 import MiniDashboardSkeleton from '@/components/skeleton/MiniDashboardSkeleton';
-import { TodoItemSkeleton } from '@/components/skeleton/TodoItemSkeleton';
+import TodoItemSkeleton from '@/components/skeleton/TodoItemSkeleton';
 import ReadOnlyMessage from '@/components/common/ReadOnlyMessage';
 import EmptyTodo from '@/components/common/EmptyTodo';
 import ErrorState from '@/components/common/ErrorState';
