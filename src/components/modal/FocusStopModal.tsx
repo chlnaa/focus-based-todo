@@ -14,7 +14,7 @@ interface FocusStopModalProps {
   onConfirm: () => void;
 }
 
-export function FocusStopModal({
+export default function FocusStopModal({
   open,
   onOpenChange,
   onConfirm,

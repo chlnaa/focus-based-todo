@@ -2,7 +2,7 @@ import { updatePassword } from '@/api/auth';
 import type { UseMutationCallback } from '@/types/types';
 import { useMutation } from '@tanstack/react-query';
 
-export function useUpdatePassword(callbacks?: UseMutationCallback) {
+export default function useUpdatePassword(callbacks?: UseMutationCallback) {
   return useMutation({
     mutationFn: updatePassword,
     onSuccess: () => {

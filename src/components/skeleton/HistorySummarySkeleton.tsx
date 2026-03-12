@@ -1,6 +1,6 @@
 import { Skeleton } from '@/components/ui/skeleton';
 
-export function HistorySummarySkeleton() {
+export default function HistorySummarySkeleton() {
   return (
     <div className="w-full h-16 bg-card border-2 rounded-3xl px-6 flex items-center justify-between">
       <div className="flex items-center gap-2">

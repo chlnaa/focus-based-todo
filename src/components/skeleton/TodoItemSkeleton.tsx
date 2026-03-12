@@ -1,6 +1,6 @@
 import { Skeleton } from '@/components/ui/skeleton';
 
-export function TodoItemSkeleton() {
+export default function TodoItemSkeleton() {
   return (
     <div className="w-full h-32 bg-card border-2 rounded-xl p-4 flex flex-col justify-between">
       <div className="flex items-center justify-between gap-3">

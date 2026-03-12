@@ -4,7 +4,7 @@ interface ChartSkeletonProps {
   type: 'line' | 'bar';
 }
 
-export function ChartSkeleton({ type }: ChartSkeletonProps) {
+export default function ChartSkeleton({ type }: ChartSkeletonProps) {
   return (
     <div className="w-full h-40 bg-card border-2 rounded-xl p-4 flex flex-col gap-4">
       <Skeleton className="h-5 w-40" />

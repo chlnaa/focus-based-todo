@@ -1,5 +1,5 @@
-import { ChartSkeleton } from './ChartSkeleton';
-import { HistorySummarySkeleton } from './HistorySummarySkeleton';
+import ChartSkeleton from './ChartSkeleton';
+import HistorySummarySkeleton from './HistorySummarySkeleton';
 
 export default function FocusHistoryLoading() {
   return (

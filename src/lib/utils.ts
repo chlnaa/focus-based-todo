@@ -1,4 +1,3 @@
-import type { Todo } from '@/types/types';
 import { clsx, type ClassValue } from 'clsx';
 import dayjs from 'dayjs';
 import { twMerge } from 'tailwind-merge';
