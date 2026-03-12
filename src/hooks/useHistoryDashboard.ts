@@ -7,7 +7,10 @@ interface DailyFocus {
   totalSeconds: number;
 }
 
-export function useHistoryDashboard(todos: Todo[], focusData: DailyFocus[]) {
+export default function useHistoryDashboard(
+  todos: Todo[],
+  focusData: DailyFocus[],
+) {
   return useMemo<HistoryStat[]>(() => {
     const todoMap = new Map<string, { total: number; completed: number }>();
 

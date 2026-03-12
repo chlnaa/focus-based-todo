@@ -3,7 +3,10 @@ import { todoKeys } from '@/constants/queryKeys';
 import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 
-export function useTodayTodos(date: string, userId: string | undefined) {
+export default function useTodayTodos(
+  date: string,
+  userId: string | undefined,
+) {
   const isToday = dayjs(date).isSame(dayjs(), 'day');
 
   return useQuery({

@@ -4,7 +4,7 @@ import useDayDashboard from '@/hooks/useDayDashboard';
 import { DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { DialogDescription } from '@radix-ui/react-dialog';
 import { useSession } from '@/stores/session';
-import { useHistoryTodos } from '@/hooks/queries/useHistoryTodos';
+import useHistoryTodos from '@/hooks/queries/todo/useHistoryTodos';
 import useTodayFocusTime from '@/hooks/queries/focus/useTodayFocusTime';
 
 interface HistoryDetailModalProps {

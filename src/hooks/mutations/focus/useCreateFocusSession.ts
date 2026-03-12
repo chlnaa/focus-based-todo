@@ -4,7 +4,7 @@ import { useSession } from '@/stores/session';
 import type { UseMutationCallback } from '@/types/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-export function useCreateFocusSession(callbacks?: UseMutationCallback) {
+export default function useCreateFocusSession(callbacks?: UseMutationCallback) {
   const queryClient = useQueryClient();
   const session = useSession();
   const userId = session?.user.id;

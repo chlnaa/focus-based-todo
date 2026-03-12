@@ -10,7 +10,7 @@ type UpdateTodoVariables = {
   date: string;
 };
 
-export function useUpdateTodo(callbacks?: UseMutationCallback) {
+export default function useUpdateTodo(callbacks?: UseMutationCallback) {
   const queryClient = useQueryClient();
   const session = useSession();
   const userId = session?.user.id;

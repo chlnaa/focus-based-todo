@@ -3,7 +3,7 @@ import { focusKeys } from '@/constants/queryKeys';
 import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 
-export function useFocusSessionsByDate(date: string, userId?: string) {
+export default function useFocusSessionsByDate(date: string, userId?: string) {
   const isToday = dayjs(date).isSame(dayjs(), 'day');
 
   return useQuery({
