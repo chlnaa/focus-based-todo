@@ -4,15 +4,19 @@
 
 ---
 
-FocustDo is a productivity web application that combines task management with focus session tracking and analytics.
+FocusDo is a productivity web application that combines task management with focus session tracking.
+Focus sessions are stored as raw event data in the `focus_sessions` table.
+Instead of storing aggregated metrics, analytics are derived dynamically from session records.
+Session data is fetched from Supabase using React Query and aggregated on the client to generate daily statistics and productivity insights.
+Todo statistics and focus session data power the dashboard and history visualizations.
+The system follows a layered client architecture where pages orchestrate UI composition, hooks encapsulate domain logic, and feature modules implement interactive UI components.
+This architecture keeps the focus tracking domain simple while separating data storage, analytics computation, and visualization.
 
-The system records focus sessions as raw data in the `focus_sessions` table.
-Instead of storing aggregated values, analytics are derived dynamically from session data.
+---
 
-Session records are fetched from Supabase and aggregated on the client using React Query hooks.
-Analytics data is then combined with todo statistics and visualized using D3 charts.
+## 🔗 Live Demo
 
-This architecture avoids duplicated writes and separates the focus tracking domain from analytics and visualization layers.
+focus-based-todo.vercel.app
 
 ---
 
@@ -30,77 +34,130 @@ This architecture avoids duplicated writes and separates the focus tracking doma
 
 ## 🗂️ Pages
 
-- **Today Page**  
-  Main page for adding, editing, and managing daily todos, with a dashboard summary.
+### Today Page
 
-- **Focus Page**  
-  Dedicated page for running focus sessions on a selected todo.
+Main productivity hub.
 
-- **Focus History Page**  
-  Visualizes daily and weekly focus history records.Visualizes weekly focus trends using charts,  
-  while daily records are presented as summary cards with detailed views in a modal.
+Users can:
+
+- view the weekly calendar
+- manage daily todos
+- start focus sessions
+- see daily productivity metrics
+
+The dashboard summarizes:
+
+- total focus time
+- todo completion rate
+- completed tasks
+
+---
+
+### Focus Page
+
+Runs a focus timer for a selected todo.
+When the timer completes, a focus session record is stored in the database.
+
+Each session stores:
+
+- `user_id`
+- `todo_id`
+- `duration`
+- `start_time`
+
+---
+
+### Focus History Page
+
+Displays historical focus data.
+
+Weekly focus trends are visualized using charts, while daily summaries are presented as cards.
+Detailed records can be inspected through modal views.
 
 ---
 
 ## 🛠️ Tech Stack
 
-Frontend
+### Frontend
 
-- **React + TypeScript**
+- React
+- TypeScript
 
-Routing
+### Routing
 
-- **React Router**
+- React Router
 
-State Management
+### State Management
 
-- **Zustand**
+- Zustand (UI state)
 
-Server State
+### Server State
 
-- **TanStack Query**
+- TanStack Query
 
-Backend / Database
+### Backend / Database
 
-- **Supabase (PostgreSQL)**
+- Supabase (PostgreSQL)
 
-Data Visualization
+### Visualization
 
-- **D3.js**
+- D3.js
 
-Styling
+### Styling
 
-- **Tailwind CSS**
-- **shadcn/ui**
+- Tailwind CSS
+- shadcn/ui
 
-Date Library
+### Date Handling
 
-- **Day.js**
+- Day.js
 
 ---
 
-## 📊 Architecture Notes
+## 📊 Architecture Overview
 
-The application separates data fetching, analytics computation, and visualization.
-Focus sessions are stored as raw records and analytics are computed dynamically.
+The application separates UI rendering, domain logic, and server state.
+The following diagram illustrates the unidirectional data flow and client-side aggregation pipeline used in the application.
+
+![architecture-diagram-img](./public/images/architecture-diagram.png)
+
+Pages orchestrate application flow and UI composition, while domain logic is encapsulated in reusable hooks.
+Feature modules compose these hooks into interactive UI components and implement user-facing interactions.
 
 ---
 
 ## 🏗 Architecture Principles
 
-- **Page-level orchestration**  
-  Page components do not implement domain logic directly.  
-  Instead, they orchestrate UI flow by composing stores and custom hooks.
+### Page-level orchestration
 
-- **Domain logic isolation**  
-  Todo and focus-related business logic is isolated within stores and hooks.
+Page components coordinate UI composition but avoid implementing domain logic directly.
+Instead, they compose hooks and stores that encapsulate behavior.
 
-- **Explicit UI state modeling**  
-  Loading, empty, read-only, and error states are intentionally modeled and rendered.
+---
 
-- **No premature optimization**  
-  Advanced optimizations such as virtualization or infinite scroll  
-  will be introduced only when real usage patterns require them.
+### Domain logic isolation
+
+Todo operations, focus tracking, and analytics logic are implemented in hooks and feature modules rather than page components.
+This improves maintainability and testability.
+
+---
+
+### Explicit UI state modeling
+
+The UI explicitly models important states:
+
+- loading
+- empty
+- read-only
+- error
+
+These states are represented by dedicated UI components.
+
+---
+
+### Avoid premature optimization
+
+Complex optimizations such as virtualization or pagination are intentionally postponed until real usage patterns require them.
 
 ---
 
@@ -111,45 +168,50 @@ Todo Created (Today Page)
         ↓
 Focus Timer (Focus Page)
         ↓
+Focus Session Completed
+        ↓
 Focus Session Stored
         ↓
 Supabase Database (focus_sessions)
         ↓
-React Query Data Hooks
-(useDailyAggregation)
+React Query Hooks
         ↓
 Client-side Aggregation
         ↓
-Analytics Hooks
-(useHistoryDashboard)
+Dashboard / Analytics Hooks
         ↓
-Visualization Layer
-(D3 Charts + Dashboard UI)
+Visualization Components
 ```
 
 ---
 
 ## 🧩 Analytics Layers
 
-The analytics system is structured into three layers:
+Analytics are computed on the client from raw session records.
 
-Data Fetch Layer
+### Data Fetch Layer
 
-- `useDailyAggregation`
-- Fetches session data from Supabase and aggregates focus time.
+- `useTodayFocusTime`
+- `useTodoFocusTime`
 
-Analytics Layer
+Fetch focus session records and compute total durations.
 
-- `useHistoryDashboard`
-- Combines focus statistics with todo completion data.
+---
 
-Visualization Layer
+### Analytics Layer
 
-- `FocusTrendChart`
-- `FocusTimeBarChart`
-- `DayHistoryCard`
+- `useDayDashboard`
 
-Charts are implemented using D3.js.
+Combines focus statistics and todo completion metrics to generate dashboard data.
+
+---
+
+### Visualization Layer
+
+- Dashboard components
+- History charts (D3)
+
+These components present aggregated data in charts and summary cards.
 
 ---
 
@@ -173,23 +235,37 @@ src
  └ types
 ```
 
-Domain logic is separated from UI components to improve scalability and maintainability.
+This structure separates UI, domain logic, and data access layers.
+Domain logic is separated from UI components to keep the system modular and scalable.
 
 ---
 
 ## 🧠 Design Decisions
 
-- Read-only dates are modeled as an explicit UI state to prevent misleading interactions.
-- Empty states reflect whether the current date context allows user interaction.
-- Date navigation logic is kept stateless to avoid hidden coupling across pages.
+### Read-only date model
+
+Past and future dates are treated as read-only to prevent misleading interactions.
+Users can only modify todos for the current day.
+
+---
+
+### Explicit empty states
+
+Empty states are intentionally modeled to communicate whether the user can interact with the current context.
+
+---
+
+### Stateless date navigation
+
+Calendar navigation logic is implemented as stateless utilities to avoid hidden coupling between pages.
 
 ---
 
 ## ⚖️ Trade-offs
 
-- All data is currently stored in memory for faster iteration.
-- Focus history visualization prioritizes clarity over performance at scale.
-- Mobile UX is functional but not fully optimized for very small screens.
+- Analytics are computed on the client instead of using database views.
+- Focus history visualization prioritizes clarity over scalability.
+- Mobile UX is functional but not fully optimized for small screens.
 
 ---
 
@@ -204,20 +280,13 @@ npm run dev
 
 ## 📈 Future Improvements
 
-- List virtualization or infinite scroll
-- ~~Persistent storage or backend sync~~
-- Extended focus analytics
-- Further mobile UX refinements
+- List virtualization for large datasets
+- Extended productivity analytics
+- Improved mobile experience
 - Dark mode support
 - Database view-based aggregation
 - Query performance optimization with indexes
 - Timer session recovery
-
----
-
-## 🔗 Live Demo
-
-focus-based-todo.vercel.app
 
 ---
 
