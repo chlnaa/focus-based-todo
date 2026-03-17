@@ -31,3 +31,8 @@ export interface HistoryStat {
   completedCount: number;
   completionRate: number;
 }
+
+export interface DailyAggregation {
+  date: string;
+  totalSeconds: number;
+}

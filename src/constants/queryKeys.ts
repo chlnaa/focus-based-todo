@@ -16,7 +16,7 @@ export const focusKeys = {
 
   all: (userId: string) => [...focusKeys.root, userId] as const,
 
-  daily: (userId: string, from: string, to: string) =>
+  weekly: (userId: string, from: string, to: string) =>
     [...focusKeys.all(userId), 'daily', from, to] as const,
 
   byDate: (userId: string, date: string) =>

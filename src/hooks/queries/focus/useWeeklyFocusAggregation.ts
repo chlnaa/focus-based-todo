@@ -1,19 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
 import { getDailyAggregation } from '@/api/focus';
 import { focusKeys } from '@/constants/queryKeys';
+import type { DailyAggregation } from '@/types/types';
 
-export interface DailyAggregation {
-  date: string;
-  totalSeconds: number;
-}
-
-export default function useDailyAggregation(
+export default function useWeeklyFocusAggregation(
   userId?: string,
   from?: string,
   to?: string,
 ) {
   return useQuery({
-    queryKey: userId && from && to ? focusKeys.daily(userId, from, to) : [],
+    queryKey: userId && from && to ? focusKeys.weekly(userId, from, to) : [],
 
     queryFn: async (): Promise<DailyAggregation[]> => {
       if (!userId || !from || !to) return [];
