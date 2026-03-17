@@ -28,6 +28,8 @@ export default function useHistoryDashboard(
       }
     }
 
+    const focusMap = new Map(focusData.map((f) => [f.date, f.totalSeconds]));
+
     const result: HistoryStat[] = [];
 
     const allDates = new Set([
@@ -37,14 +39,13 @@ export default function useHistoryDashboard(
 
     for (const date of allDates) {
       const todoEntry = todoMap.get(date);
-      const focusEntry = focusData.find((f) => f.date === date);
-
       const totalCount = todoEntry?.total ?? 0;
       const completedCount = todoEntry?.completed ?? 0;
+      const totalSeconds = focusMap.get(date) ?? 0;
 
       result.push({
         date,
-        totalSeconds: focusEntry?.totalSeconds ?? 0,
+        totalSeconds,
         totalCount,
         completedCount,
         completionRate:

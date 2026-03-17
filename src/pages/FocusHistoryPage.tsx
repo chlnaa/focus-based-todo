@@ -1,23 +1,26 @@
-import prepareChartData from '@/lib/chart-utils';
 import DayHistoryCard from '@/features/history/DayHistoryCard';
 import DateNavigationHeader from '@/components/common/DateNavigationHeader';
 import FocusTimeBarChart from '@/features/history/FocusTimeBarChart';
 import FocusTrendChart from '@/features/history/FocusTrendChart';
 import useWeekNavigation from '@/hooks/useWeekNavigation';
-import { useSelectedDate } from '@/stores/useTodoStore';
-import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 import FocusHistoryLoading from '@/components/skeleton/FocusHistoryLoading';
 import ErrorState from '@/components/common/ErrorState';
 import { useSession } from '@/stores/session';
 import useAllTodos from '@/hooks/queries/todo/useAllTodos';
-import useDailyAggregation from '@/hooks/queries/focus/useDailyAggregation';
+import useWeeklyFocusAggregation from '@/hooks/queries/focus/useWeeklyFocusAggregation';
 import useHistoryDashboard from '@/hooks/useHistoryDashboard';
+import useAllFocusAggregation from '@/hooks/queries/focus/useAllFocusAggregation';
+import {
+  prepareFocusChartData,
+  prepareTrendChartData,
+} from '@/lib/chart-utils';
+import dayjs from 'dayjs';
 
 export default function FocusHistoryPage() {
   const session = useSession();
-  const selectedDate = useSelectedDate();
-  const [historyBaseDate, setHistoryBaseDate] = useState(selectedDate);
+  const today = dayjs().format('YYYY-MM-DD');
+  const [historyBaseDate, setHistoryBaseDate] = useState(today);
 
   const userId = session?.user.id;
 
@@ -34,30 +37,24 @@ export default function FocusHistoryPage() {
   } = useAllTodos(userId);
 
   const {
-    data: dailyFocus = [],
+    data: weeklyFocus = [],
     isLoading: focusLoading,
     isError: focusError,
-  } = useDailyAggregation(userId, from, to);
+  } = useWeeklyFocusAggregation(userId, from, to);
 
-  const historyStats = useHistoryDashboard(historyTodos, dailyFocus);
+  const { data: allFocus = [] } = useAllFocusAggregation(userId);
 
-  const chartData = useMemo(
-    () => prepareChartData(historyStats),
-    [historyStats],
+  const historyStats = useHistoryDashboard(historyTodos, allFocus);
+
+  const trendChartData = useMemo(
+    () => prepareTrendChartData(historyStats, baseDate),
+    [historyStats, baseDate],
   );
 
-  const weeklyData = useMemo(() => {
-    const start = baseDate.startOf('day');
-    const end = baseDate.endOf('week').endOf('day');
-
-    return chartData.filter((d) => {
-      const targetDate = dayjs(d.date);
-      return (
-        (targetDate.isSame(start) || targetDate.isAfter(start)) &&
-        (targetDate.isSame(end) || targetDate.isBefore(end))
-      );
-    });
-  }, [chartData, baseDate]);
+  const barChartData = useMemo(
+    () => prepareFocusChartData(weeklyFocus),
+    [weeklyFocus],
+  );
 
   const goPrevWeek = () => setHistoryBaseDate(getPrevWeekDate());
   const goNextWeek = () => {
@@ -87,8 +84,8 @@ export default function FocusHistoryPage() {
           onNext={goNextWeek}
         />
         <div className="flex items-center gap-5">
-          <FocusTrendChart data={weeklyData} baseDate={baseDate} />
-          <FocusTimeBarChart data={weeklyData} baseDate={baseDate} />
+          <FocusTrendChart data={trendChartData} baseDate={baseDate} />
+          <FocusTimeBarChart data={barChartData} baseDate={baseDate} />
         </div>
       </div>
 

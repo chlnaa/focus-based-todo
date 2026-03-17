@@ -25,18 +25,6 @@ export async function getFocusSessionsByDate(userId: string, date: string) {
   return data;
 }
 
-export async function getTotalFocusTime(userId: string) {
-  const { data, error } = await supabase
-    .from('focus_sessions')
-    .select('duration')
-    .eq('user_id', userId);
-
-  if (error) throw error;
-
-  const total = data?.reduce((acc, curr) => acc + curr.duration, 0) ?? 0;
-  return total;
-}
-
 export async function getTodayFocusTime(userId: string, date: string) {
   const start = dayjs(date).startOf('day').toDate();
   const end = dayjs(date).add(1, 'day').startOf('day').toDate();
@@ -78,6 +66,24 @@ export async function getDailyAggregation(
     .eq('user_id', userId)
     .gte('start_time', start)
     .lt('start_time', end);
+
+  if (error) throw error;
+
+  const map: Record<string, number> = {};
+
+  data?.forEach((session) => {
+    const date = dayjs(session.start_time).format('YYYY-MM-DD');
+    map[date] = (map[date] || 0) + session.duration;
+  });
+
+  return map;
+}
+
+export async function getAllDailyAggregation(userId: string) {
+  const { data, error } = await supabase
+    .from('focus_sessions')
+    .select('start_time, duration')
+    .eq('user_id', userId);
 
   if (error) throw error;
 
