@@ -32,6 +32,7 @@ export default function SignInPage() {
         <label htmlFor="email">Email</label>
         <Input
           className="py-6"
+          id="email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -41,6 +42,7 @@ export default function SignInPage() {
         <label htmlFor="password">Password</label>
         <Input
           className="py-6"
+          id="password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
