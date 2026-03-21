@@ -40,6 +40,7 @@ const useSessionStore = create(
     })),
     {
       name: 'sessionStore',
+      enabled: import.meta.env.DEV,
     },
   ),
 );
