@@ -1,23 +1,41 @@
-import type { Session } from '@supabase/supabase-js';
 import { create } from 'zustand';
 import { combine, devtools } from 'zustand/middleware';
+import type { Session as SupabaseSession } from '@supabase/supabase-js';
+
+type Session = {
+  user: {
+    id: string;
+    email?: string;
+  };
+};
 
 type State = {
   isLoaded: boolean;
   session: Session | null;
 };
 
-const initialState = {
+const initialState: State = {
   isLoaded: false,
   session: null,
-} as State;
+};
+
+function mapSession(session: SupabaseSession | null): Session | null {
+  if (!session) return null;
+
+  return {
+    user: {
+      id: session.user.id,
+      email: session.user.email ?? undefined,
+    },
+  };
+}
 
 const useSessionStore = create(
   devtools(
     combine(initialState, (set) => ({
       actions: {
-        setSession: (session: Session | null) =>
-          set({ session, isLoaded: true }),
+        setSession: (session: SupabaseSession | null) =>
+          set({ session: mapSession(session), isLoaded: true }),
       },
     })),
     {

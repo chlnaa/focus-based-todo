@@ -13,12 +13,22 @@ export default function SessionProvider({ children }: SessionProviderProps) {
   const isSessionLoaded = useIsSessionLoaded();
 
   useEffect(() => {
-    supabase.auth.onAuthStateChange((_, session) => {
-      setSession(session);
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
     });
-  }, []);
+
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session);
+      },
+    );
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
+  }, [setSession]);
 
   if (!isSessionLoaded) return <GlobalLoader />;
 
-  return children;
+  return <>{children}</>;
 }
