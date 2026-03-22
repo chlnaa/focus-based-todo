@@ -5,14 +5,18 @@
 ---
 
 FocusDo is a productivity web application that combines task management with focus session tracking.
-Focus sessions are stored as raw event data in the `focus_sessions` table.
-Instead of storing aggregated metrics, analytics are derived dynamically from session records.
-Session data is fetched from Supabase using React Query and aggregated on the client to generate daily statistics and productivity insights.
-Todo statistics and focus session data power the dashboard and history visualizations.
-The system follows a layered client architecture where pages orchestrate UI composition, hooks encapsulate domain logic, and feature modules implement interactive UI components.
-This architecture keeps the focus tracking domain simple while separating data storage, analytics computation, and visualization.
 
----
+Focus sessions are stored as raw event data in the `focus_sessions` table.
+
+Instead of storing aggregated metrics, analytics are derived dynamically from session records.
+
+Session data is fetched from Supabase using React Query and aggregated on the client to generate daily statistics and productivity insights.
+
+Todo statistics and focus session data power the dashboard and history visualizations.
+
+The system follows a layered client architecture where pages orchestrate UI composition, hooks encapsulate domain logic, and feature modules implement interactive UI components.
+
+## This architecture keeps the focus tracking domain simple while separating data storage, analytics computation, and visualization.
 
 ## 🔗 Live Demo
 
@@ -72,6 +76,7 @@ Each session stores:
 Displays historical focus data.
 
 Weekly focus trends are visualized using charts, while daily summaries are presented as cards.
+
 Detailed records can be inspected through modal views.
 
 ---
@@ -117,11 +122,13 @@ Detailed records can be inspected through modal views.
 ## 📊 Architecture Overview
 
 The application separates UI rendering, domain logic, and server state.
+
 The following diagram illustrates the unidirectional data flow and client-side aggregation pipeline used in the application.
 
 ![architecture-diagram-img](./public/images/architecture-diagram.png)
 
 Pages orchestrate application flow and UI composition, while domain logic is encapsulated in reusable hooks.
+
 Feature modules compose these hooks into interactive UI components and implement user-facing interactions.
 
 ---
@@ -131,6 +138,7 @@ Feature modules compose these hooks into interactive UI components and implement
 ### Page-level orchestration
 
 Page components coordinate UI composition but avoid implementing domain logic directly.
+
 Instead, they compose hooks and stores that encapsulate behavior.
 
 ---
@@ -138,6 +146,7 @@ Instead, they compose hooks and stores that encapsulate behavior.
 ### Domain logic isolation
 
 Todo operations, focus tracking, and analytics logic are implemented in hooks and feature modules rather than page components.
+
 This improves maintainability and testability.
 
 ---
@@ -236,6 +245,7 @@ src
 ```
 
 This structure separates UI, domain logic, and data access layers.
+
 Domain logic is separated from UI components to keep the system modular and scalable.
 
 ---
@@ -245,6 +255,7 @@ Domain logic is separated from UI components to keep the system modular and scal
 ### Read-only date model
 
 Past and future dates are treated as read-only to prevent misleading interactions.
+
 Users can only modify todos for the current day.
 
 ---
