@@ -18,11 +18,8 @@ export default function useUpdateTodo(callbacks?: UseMutationCallback) {
   return useMutation({
     mutationFn: ({ id, updates }: UpdateTodoVariables) =>
       updateTodo(id, updates),
-
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: todoKeys.all,
-      });
+      await queryClient.invalidateQueries({ queryKey: todoKeys.all });
       if (callbacks?.onSuccess) callbacks.onSuccess();
     },
 
@@ -36,17 +33,24 @@ export default function useUpdateTodo(callbacks?: UseMutationCallback) {
       const dateKey = todoKeys.byDate(date, userId);
       const itemKey = todoKeys.byId(id);
 
-      const previousTodos = queryClient.getQueryData<TodoEntity[]>(dateKey);
-
+      const previousTodos = queryClient.getQueryData(dateKey);
       const previousItem = queryClient.getQueryData<TodoEntity>(itemKey);
 
-      queryClient.setQueryData<TodoEntity[]>(
-        dateKey,
-        (old) =>
-          old?.map((todo) =>
-            todo.id === id ? { ...todo, ...updates } : todo,
-          ) ?? [],
-      );
+      queryClient.setQueryData(dateKey, (old: any) => {
+        if (!old) return old;
+
+        if (!old.pages) return old;
+
+        return {
+          ...old,
+          pages: old.pages.map((page: any) => ({
+            ...page,
+            data: page.data.map((todo: TodoEntity) =>
+              todo.id === id ? { ...todo, ...updates } : todo,
+            ),
+          })),
+        };
+      });
 
       queryClient.setQueryData<TodoEntity>(itemKey, (old) =>
         old ? { ...old, ...updates } : old,
@@ -59,7 +63,6 @@ export default function useUpdateTodo(callbacks?: UseMutationCallback) {
       if (context?.previousTodos) {
         queryClient.setQueryData(context.dateKey, context.previousTodos);
       }
-
       if (context?.previousItem) {
         queryClient.setQueryData(context.itemKey, context.previousItem);
       }
