@@ -5,7 +5,7 @@ type InfiniteScrollParams = {
   fetchNextPage: () => void;
 };
 
-export function useInfiniteScroll({
+export default function useInfiniteScroll({
   hasNextPage,
   fetchNextPage,
 }: InfiniteScrollParams) {
