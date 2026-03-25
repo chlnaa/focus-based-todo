@@ -7,7 +7,7 @@ export default function useHistoryTodos(
   userId: string | undefined,
 ) {
   return useQuery({
-    queryKey: userId ? todoKeys.byDate(date, userId) : [],
+    queryKey: userId ? todoKeys.historyByDate(date, userId) : [],
     queryFn: () => getTodosByDate(date, userId!),
     enabled: !!userId,
     staleTime: 1000 * 60 * 5,

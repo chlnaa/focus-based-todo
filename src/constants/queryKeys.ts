@@ -8,6 +8,9 @@ export const todoKeys = {
   byDate: (date: string, userId: string) =>
     [...todoKeys.all, 'date', date, userId] as const,
 
+  historyByDate: (date: string, userId: string) =>
+    [...todoKeys.all, 'history-date', date, userId] as const,
+
   byId: (id: string) => [...todoKeys.all, 'item', id] as const,
 };
 

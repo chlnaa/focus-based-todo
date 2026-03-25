@@ -16,6 +16,7 @@ import {
   prepareTrendChartData,
 } from '@/lib/chart-utils';
 import dayjs from 'dayjs';
+import useInfiniteScroll from '@/hooks/infinite/useInfiniteScroll';
 
 export default function FocusHistoryPage() {
   const session = useSession();
@@ -66,6 +67,22 @@ export default function FocusHistoryPage() {
   const nextWeekDate = getNextWeekDate();
   const isNextDisabled = !nextWeekDate;
 
+  const PAGE_SIZE = 10;
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  const visibleStats = historyStats.slice(0, visibleCount);
+
+  const hasNextPage = visibleCount < historyStats.length;
+
+  const fetchNextPage = () => {
+    setVisibleCount((prev) => prev + PAGE_SIZE);
+  };
+
+  const loadMoreRef = useInfiniteScroll({
+    hasNextPage,
+    fetchNextPage,
+  });
+
   if (todosLoading || focusLoading) return <FocusHistoryLoading />;
 
   if (todosError || focusError)
@@ -89,9 +106,11 @@ export default function FocusHistoryPage() {
         </div>
       </div>
 
-      {historyStats.map((stat) => (
+      {visibleStats.map((stat) => (
         <DayHistoryCard key={stat.date} date={stat.date} stats={stat} />
       ))}
+
+      <div ref={loadMoreRef} />
     </div>
   );
 }

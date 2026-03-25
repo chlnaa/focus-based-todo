@@ -12,26 +12,37 @@ import ReadOnlyMessage from '@/components/common/ReadOnlyMessage';
 import EmptyTodo from '@/components/common/EmptyTodo';
 import ErrorState from '@/components/common/ErrorState';
 import dayjs from 'dayjs';
-import useTodayTodos from '@/hooks/queries/todo/useTodayTodos';
 import useTodayFocusTime from '@/hooks/queries/focus/useTodayFocusTime';
+import useInfiniteTodayTodos from '@/hooks/infinite/useInfiniteTodayTodos';
+import useInfiniteScroll from '@/hooks/infinite/useInfiniteScroll';
 
 type ReadOnlyVariant = 'past' | 'future';
 
 export default function TodayPage() {
   const session = useSession();
+  const userId = session?.user.id;
+
   const selectedDate = useSelectedDate();
   const setSelectedDate = useSetSelectedDate();
 
   const [viewDate, setViewDate] = useState(selectedDate);
 
   const {
-    data: todosData = [],
+    data,
     isLoading,
     isError,
-  } = useTodayTodos(selectedDate, session?.user.id);
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteTodayTodos({
+    date: selectedDate,
+    userId,
+  });
+
+  const todosData = data?.pages.flatMap((page) => page.data) ?? [];
 
   const { data: totalFocusSeconds = 0 } = useTodayFocusTime(
-    session?.user.id ?? '',
+    userId ?? '',
     selectedDate,
   );
 
@@ -50,6 +61,11 @@ export default function TodayPage() {
       : null;
 
   if (isError) return <ErrorState message="Failed to load data." />;
+
+  const loadMoreRef = useInfiniteScroll({
+    hasNextPage,
+    fetchNextPage,
+  });
 
   return (
     <div className="flex flex-col gap-4">
@@ -83,7 +99,11 @@ export default function TodayPage() {
       ) : !readOnlyVariant && todosData.length === 0 ? (
         <EmptyTodo />
       ) : (
-        <TodoList filteredTodos={todosData} />
+        <>
+          <TodoList filteredTodos={todosData} />
+          <div ref={loadMoreRef} />
+          {isFetchingNextPage && <TodoItemSkeleton />}
+        </>
       )}
     </div>
   );

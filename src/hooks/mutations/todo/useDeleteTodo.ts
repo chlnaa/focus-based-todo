@@ -16,10 +16,10 @@ export default function useDeleteTodo(callbacks?: UseMutationCallback) {
       if (!userId) return;
 
       await queryClient.cancelQueries({
-        queryKey: todoKeys.all,
+        queryKey: todoKeys.dateRoot(),
       });
 
-      const queries = queryClient.getQueriesData<TodoEntity[]>({
+      const queries = queryClient.getQueriesData({
         queryKey: todoKeys.dateRoot(),
       });
 
@@ -28,11 +28,22 @@ export default function useDeleteTodo(callbacks?: UseMutationCallback) {
         data,
       }));
 
-      queries.forEach(([key, old]) => {
-        queryClient.setQueryData(
-          key,
-          old?.filter((todo) => todo.id !== id),
-        );
+      queries.forEach(([key, _]) => {
+        queryClient.setQueryData(key, (oldData: any) => {
+          if (!oldData) return oldData;
+
+          if (oldData.pages) {
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page: any) => ({
+                ...page,
+                data: page.data.filter((todo: TodoEntity) => todo.id !== id),
+              })),
+            };
+          }
+
+          return oldData?.filter((todo: TodoEntity) => todo.id !== id);
+        });
       });
 
       const itemKey = todoKeys.byId(id);
@@ -49,7 +60,8 @@ export default function useDeleteTodo(callbacks?: UseMutationCallback) {
       await queryClient.invalidateQueries({
         queryKey: todoKeys.all,
       });
-      if (callbacks?.onSuccess) callbacks.onSuccess();
+
+      callbacks?.onSuccess?.();
     },
 
     onError: (error, _, context) => {
@@ -60,7 +72,8 @@ export default function useDeleteTodo(callbacks?: UseMutationCallback) {
       if (context?.previousItem) {
         queryClient.setQueryData(context.itemKey, context.previousItem);
       }
-      if (callbacks?.onError) callbacks.onError(error);
+
+      callbacks?.onError?.(error);
     },
   });
 }
