@@ -1,4 +1,4 @@
-# 📝 Focusdo App — 집중 타이머 및 생산성 분석 앱
+# 📝 FocusDo App — 집중 타이머 및 생산성 분석 앱
 
 [English](./README.md) | [한국어] | [日本語](./README.ja.md)
 
@@ -6,15 +6,22 @@
 
 FocusDo는 할 일 관리와 집중 세션 추적을 결합한 생산성 웹 애플리케이션입니다.
 
-집중 세션은 `focus_sessions` 테이블에 가공되지 않은 이벤트 데이터(Raw data)로 저장됩니다. 집계된 지표를 별도로 저장하는 대신, 세션 기록으로부터 동적으로 분석 데이터를 도출합니다.
+집중 세션은 `focus_sessions` 테이블에 가공되지 않은 이벤트 데이터로 저장됩니다.
 
-세션 데이터는 React Query를 사용하여 Supabase에서 가져오며, 일일 통계 및 생산성 인사이트를 생성하기 위해 클라이언트 측에서 집계됩니다.
+집계된 지표를 별도로 저장하는 대신, 다음과 같은 하이브리드 방식으로 분석을 수행합니다:
 
-할 일(Todo) 통계와 집중 세션 데이터는 대시보드와 히스토리 시각화의 기반이 됩니다.
+- API 레이어에서의 부분 집계 (일별 그룹화)
+- 클라이언트에서의 최종 집계 (대시보드 및 히스토리 로직)
+- 시각화를 위한 데이터 가공 (누락된 날짜 채우기, D3 포맷 변환)
 
-시스템은 페이지(Page)가 UI 구성을 조정하고, 훅(Hooks)이 도메인 로직을 캡슐화하며, 기능(Feature) 모듈이 인터랙티브 UI 컴포넌트를 구현하는 계층형 클라이언트 아키텍처를 따릅니다.
+세션 데이터는 React Query를 사용하여 Supabase에서 가져오며, 클라이언트에서 집계되어 생산성 인사이트를 생성합니다.
 
-이러한 아키텍처는 데이터 저장, 분석 계산, 시각화를 분리함으로써 집중 추적 도메인을 단순하게 유지합니다.
+대시보드 지표는 다음 두 가지를 기반으로 도출됩니다:
+
+- 할 일 상태 (완료율)
+- 집중 세션 데이터 (총 집중 시간)
+
+본 시스템은 페이지가 UI 구성을 조율하고, 훅이 도메인 로직을 캡슐화하며, 기능 모듈이 대화형 UI 컴포넌트를 구현하는 계층형 클라이언트 아키텍처를 따릅니다.
 
 ---
 
@@ -26,13 +33,15 @@ focus-based-todo.vercel.app
 
 ## ✨ 주요 기능
 
-- ⏱️ Focus Timer
+- ⏱️ Focus Timer (25분 / 50분 / 사용자 정의)
 - 📝 Todo 관리
 - 📊 일일 생산성 대시보드
 - 📈 주간 집중 시간 분석
 - 🗂️ Focus Session 히스토리
 - 📉 D3 기반 데이터 시각화
 - ⚡ React Query 기반 데이터 캐싱
+- ♾️ 무한 스크롤 (커서 기반 페이지네이션)
+- ⚡ 낙관적 UI 업데이트 (Optimistic UI)
 
 ---
 
@@ -40,33 +49,34 @@ focus-based-todo.vercel.app
 
 ### Today Page
 
-메인 생산성 페이지입니다.
+메인 생산성 허브입니다.
 
-사용자는 다음 작업을 수행할 수 있습니다.
+사용자는 다음을 수행할 수 있습니다:
 
 - 주간 캘린더 확인
-- 오늘의 Todo 관리
+- 일일 할 일 관리
 - 집중 세션 시작
-- 오늘의 생산성 통계 확인
+- 일일 생산성 지표 확인
 
-대시보드는 다음 정보를 요약합니다.
+대시보드 요약 내용:
 
 - 총 집중 시간
-- Todo 완료율
+- 할 일 완료율
 - 완료된 작업 수
+
+과거 및 미래 날짜는 읽기 전용 모드로 표시됩니다.
 
 ---
 
 ### Focus Page
 
-선택한 Todo에 대해 집중 타이머를 실행하는 페이지입니다.
+선택한 할 일에 대해 집중 타이머를 실행합니다.
 
-타이머가 종료되면 다음 정보가 데이터베이스에 저장됩니다.
+타이머가 종료되거나 사용자가 조기에 중단하면 확인 모달이 표시됩니다.
 
-- user_id
-- todo_id
-- duration
-- start_time
+확인 시, 다음과 같은 데이터가 데이터베이스에 저장됩니다:
+
+- `user_id`, `todo_id`, `start_time`, `end_time`, `duration`
 
 ---
 
@@ -74,9 +84,11 @@ focus-based-todo.vercel.app
 
 집중 기록을 확인하는 페이지입니다.
 
-- 주간 집중 트렌드는 차트로 시각화됩니다.
-- 일별 기록은 카드 형태로 표시됩니다.
-- 상세 기록은 모달에서 확인할 수 있습니다.
+- 주간 트렌드 → 라인 차트
+- 집중 시간 → 바 차트
+- 일별 요약 → 카드 형태
+
+---
 
 ## 🛠️ 기술 스택
 
@@ -99,7 +111,7 @@ focus-based-todo.vercel.app
 
 ### Backend / Database
 
-- Supabase (PostgreSQL)
+- Supabase (PostgreSQL + Auth)
 
 ### Visualization
 
@@ -118,19 +130,29 @@ focus-based-todo.vercel.app
 
 ## 📊 아키텍처 개요
 
-애플리케이션은 UI 렌더링, 도메인 로직, 그리고 서버 상태를 분리합니다.
+이 애플리케이션은 **관심사 분리**가 명확한 **계층형 아키텍처**를 따릅니다.
 
-다음 다이어그램은 애플리케이션에서 사용되는 단방향 데이터 흐름과 클라이언트 측 집계 파이프라인을 보여줍니다.
+아래의 시스템 흐름도는 데이터가 구조적으로 흐르는 파이프라인을 나타냅니다.
 
-![architecture-diagram-img](./public/images/architecture-diagram.png)
-
-Page는 애플리케이션 흐름과 UI 구성을 조정하는 역할을 하며,
-
-도메인 로직은 재사용 가능한 hooks에 캡슐화했습니다.
-
-Feature 모듈은 이러한 hooks를 조합하여
-
-사용자 인터랙션을 구현하는 UI 컴포넌트를 담당합니다.
+```
+Client UI (Pages / Components)
+        ↓
+React Query Hooks (queries / mutations)
+        ↓
+API Layer (api/*.ts)
+        ↓
+Supabase (PostgREST)
+        ↓
+PostgreSQL (focus_sessions, todo)
+        ↓
+Raw Data Response
+        ↓
+Client Aggregation Layer (hooks + lib/chart-utils)
+        ↓
+Derived State (dashboard / history hooks)
+        ↓
+Visualization (D3 / UI Components)
+```
 
 ---
 
@@ -138,90 +160,91 @@ Feature 모듈은 이러한 hooks를 조합하여
 
 ### 페이지 단위 오케스트레이션
 
-페이지 컴포넌트는 UI 구성을 조정하지만, 도메인 로직을 직접 구현하는 것은 지양합니다.
-
-대신, 행위를 캡슐화하는 훅과 스토어를 조합하여 사용합니다.
+페이지는 UI 구성을 조율하지만 도메인 로직은 피합니다.
 
 ---
 
 ### 도메인 로직 분리
 
-할 일(Todo) 조작, 집중 추적, 분석 로직은 페이지 컴포넌트가 아닌 훅과 기능(Feature) 모듈에 구현됩니다.
-
-이는 유지보수성과 테스트 가능성을 향상시킵니다.
+비즈니스 로직은 훅과 기능 모듈에 위치합니다.
 
 ---
 
 ### 명시적인 UI 상태 모델링
-
-UI는 다음과 같은 주요 상태를 명시적으로 모델링합니다:
 
 - loading
 - empty
 - read-only
 - error
 
-이러한 상태들은 전용 UI 컴포넌트를 통해 표현됩니다.
-
 ---
 
-### 과도한 최적화 지양
+### 하이브리드 집계 전략
 
-가상화나 페이지네이션과 같은 복잡한 최적화는 실제 사용 패턴에서 요구될 때까지 의도적으로 보류합니다.
+- API 레이어 → 부분 집계 (API 함수 내부에서 클라이언트 측 reduce를 통한 일별 그룹화)
+- 클라이언트 → 최종 계산 (완료율, 집중 시간 지표)
 
 ---
 
 ## 🔄 데이터 흐름
 
+다음은 사용자 기반의 상호작용 흐름을 설명합니다:
+
 ```
-Today 페이지에서 Todo 생성
-        ↓
-Focus Timer (Focus Page)
-        ↓
-Focus Session 완료
-        ↓
-Focus Session 저장
-        ↓
-Supabase Database (focus_sessions)
-        ↓
-React Query 훅
-        ↓
-클라이언트 사이드 aggregation
-        ↓
-Dashboard / Analytics Hooks
-        ↓
-Visualization Components
+[사용자 액션]
+
+1. Todo 작업
+   → useMutation (React Query)
+   → Supabase (insert/update/delete)
+   → Query 무효화 및 낙관적 업데이트
+
+2. Focus 시작 (Focus Page)
+   → useTimer (클라이언트 상태)
+
+3. Focus 완료
+   → Confirmation modal
+   → createFocusSession (mutation)
+   → Supabase insert
+
+4. 데이터 조회
+   → useQuery / useInfiniteQuery
+   → Supabase fetch
+
+5. 클라이언트 집계
+   → getDailyAggregation / getAllDailyAggregation (API 레이어 — 원시 데이터 조회)
+   → client-side reduce (날짜 기준 duration 합산)
+   → useWeeklyFocusAggregation / useAllFocusAggregation (React Query 래핑)
+   → useDayDashboard / useHistoryDashboard (완성률 및 통계 계산)
+   → chart-utils.ts (누락된 날짜 보정 및 D3용 데이터 변환)
+
+6. UI 렌더링
+   → Dashboard / Charts (D3)
 ```
 
 ---
 
 ## 🧩 Analytics 구조
 
-분석 데이터는 원본 세션 기록으로부터 클라이언트 측에서 계산됩니다.
-
 ### Data Fetch Layer
 
 - `useTodayFocusTime`
 - `useTodoFocusTime`
-
-집중 세션 기록을 가져오고 전체 지속 시간을 계산합니다.
+- `useWeeklyFocusAggregation`
+- `useAllFocusAggregation`
 
 ---
 
 ### Analytics Layer
 
-- `useDayDashboard`
-
-집중 통계와 할 일 완료 지표를 결합하여 대시보드 데이터를 생성합니다.
+- API aggregation (daily grouping)
+- Client aggregation (dashboard & history)
 
 ---
 
 ### Visualization Layer
 
-- Dashboard components
-- History charts (D3)
-
-이 컴포넌트들은 집계된 데이터를 차트와 요약 카드로 표시합니다.
+- Dashboard
+- D3 charts
 
 ---
 
@@ -229,25 +252,23 @@ Visualization Components
 
 ```
 src
- ├ api
- ├ components
- ├ constants
- ├ features
- │   ├ dashboard
- │   ├ date
- │   ├ history
- │   └ todo
- ├ hooks
- ├ lib
- ├ pages
- └ provider
- └ store
- └ types
+ ├── api/
+ ├── components/
+ ├── constants/
+ ├── features/
+ │   ├── dashboard/
+ │   ├── date/
+ │   ├── history/
+ │   └── todo/
+ ├── hooks/
+ ├── lib/
+ ├── pages/
+ ├── provider/
+ ├── stores/
+ ├── types/
+ ├── App.tsx
+ └── main.tsx
 ```
-
-이 구조는 UI, 도메인 로직, 그리고 데이터 액세스 계층을 분리합니다.
-
-시스템의 모듈화와 확장성을 유지하기 위해 도메인 로직은 UI 컴포넌트와 분리되어 있습니다.
 
 ---
 
@@ -255,29 +276,61 @@ src
 
 ### 읽기 전용 날짜 모델
 
-오해를 불러일으킬 수 있는 상호작용을 방지하기 위해 과거와 미래의 날짜는 읽기 전용으로 처리됩니다.
+과거와 미래의 날짜는 수정할 수 없습니다. 사용자는 현재 날짜의 할 일만 수정할 수 있습니다.
 
-사용자는 현재 날짜의 할 일만 수정할 수 있습니다.
-
----
-
-### 명시적인 빈 상태(Empty States)
-
-사용자가 현재 컨텍스트와 상호작용할 수 있는지 전달하기 위해 빈 상태를 의도적으로 모델링했습니다.
+이는 `TodayPage`의 `readOnlyVariant` 플래그와 `TodoItems`의 `isReadOnly` 플래그를 통해 강제됩니다.
 
 ---
 
-### 상태가 없는(Stateless) 날짜 탐색
+### 낙관적 업데이트
 
-페이지 간의 숨겨진 결합을 피하기 위해 캘린더 탐색 로직은 상태가 없는 유틸리티로 구현되었습니다.
+`useUpdateTodo`와 `useDeleteTodo`는 서버가 응답하기 직전에 React Query 캐시를 즉시 업데이트합니다.
+
+오류 발생 시, `onMutate` / `onError` 롤백 패턴을 통해 이전 캐시 상태로 복구됩니다.
+
+이를 통해 네트워크 왕복을 기다리지 않고 UI 응답성을 유지합니다.
+
+---
+
+### 월-클락 타이머
+
+`useTimer`는 매 인터벌 틱마다 카운터를 감소시키는 대신 `Date.now()` 스냅샷으로부터 경과 시간을 계산합니다.
+
+이는 탭 전환, 기기 절전 또는 일시 중지 중 발생하는 타이머 드리프트(상태 이탈)를 방지합니다.
+
+---
+
+### 세션 관리
+
+`SessionProvider`는 Supabase Auth 상태 변경을 감지하고 세션을 Zustand에 기록합니다.
+
+초기 세션 확인이 완료될 때까지 `GlobalLoader`가 표시되어, 인증 상태가 해결되기 전에 렌더링되는 것을 방지합니다.
+
+---
+
+### 상태 없는 날짜 네비게이션
+
+`useWeekNavigation`은 내부 상태 없이 `currentDate` prop으로부터 모든 날짜 값을 도출하며,
+
+네비게이션 로직을 UI와 분리된 상태로 유지합니다.
+
+---
+
+### 클라이언트 측 분석
+
+분석은 데이터베이스 뷰를 사용하는 대신 클라이언트의 원시 레코드로부터 계산됩니다.
+
+이는 백엔드를 단순화하지만, 유연성을 위해 약간의 확장성을 희생합니다.
 
 ---
 
 ## ⚖️ 절충 사항
 
-- 데이터베이스 뷰(View)를 사용하는 대신 클라이언트 측에서 분석 데이터를 계산합니다.
-- 집중 기록 시각화는 확장성보다 명확성을 우선시합니다.
-- 모바일 UX는 기능적으로 작동하지만 작은 화면에 완전히 최적화되지는 않았습니다.
+- 미리 계산된 데이터베이스 집계 대신 클라이언트 측 집계 사용
+- `FocusHistoryPage`는 서버 측 페이지네이션 대신 모든 할 일과 집중 기록을 한 번에 가져옴 — 개별 사용자에게는 실용적이지만 대량의 데이터에는 적합하지 않음
+- 두 가지 페이지네이션 전략(Today의 커서 기반, History의 클라이언트 측 슬라이싱)은 데이터 액세스 패턴에 따라 의도적으로 다르게 설계됨
+- 제한적인 모바일 UX 최적화
+- 사용자가 세션 중간에 탭을 닫을 경우 집중 세션 복구 불가
 
 ---
 
@@ -292,7 +345,7 @@ npm run dev
 
 ## 📈 향후 개선 사항
 
-- 대규모 데이터셋을 위한 리스트 가상화(Virtualization)
+- 대규모 데이터셋을 위한 리스트 가상화
 - 확장된 생산성 분석 기능
 - 모바일 경험 개선
 - 다크 모드 지원

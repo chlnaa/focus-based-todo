@@ -1,4 +1,4 @@
-# 📝 Focusdo App — Focus Timer & Productivity Analytics
+# 📝 FocusDo App — Focus Timer & Productivity Analytics
 
 [English] | [한국어](./README.ko.md) | [日本語](./README.ja.md)
 
@@ -8,15 +8,24 @@ FocusDo is a productivity web application that combines task management with foc
 
 Focus sessions are stored as raw event data in the `focus_sessions` table.
 
-Instead of storing aggregated metrics, analytics are derived dynamically from session records.
+Instead of storing aggregated metrics, analytics are computed through a hybrid approach:
 
-Session data is fetched from Supabase using React Query and aggregated on the client to generate daily statistics and productivity insights.
+- Partial aggregation at the API layer (daily grouping)
+- Final aggregation on the client (dashboard & history logic)
+- Data shaping for visualization (missing date fill-in, D3 format conversion)
 
-Todo statistics and focus session data power the dashboard and history visualizations.
+Session data is fetched from Supabase using React Query and aggregated on the client to generate productivity insights.
 
-The system follows a layered client architecture where pages orchestrate UI composition, hooks encapsulate domain logic, and feature modules implement interactive UI components.
+Dashboard metrics are derived from both:
 
-## This architecture keeps the focus tracking domain simple while separating data storage, analytics computation, and visualization.
+- Todo state (completion rate)
+- Focus session data (total focus time)
+
+The system follows a layered client architecture where pages orchestrate UI composition,
+
+hooks encapsulate domain logic, and feature modules implement interactive UI components.
+
+---
 
 ## 🔗 Live Demo
 
@@ -26,13 +35,15 @@ focus-based-todo.vercel.app
 
 ## ✨ Features
 
-- ⏱️ Focus Timer
+- ⏱️ Focus Timer (25min / 50min / Custom)
 - 📝 Todo Management
 - 📊 Daily Productivity Dashboard
 - 📈 Weekly Focus Time Analytics
 - 🗂️ Focus Session History
 - 📉 Data Visualization with D3
 - ⚡ Data Fetching & Caching with React Query
+- ♾️ Infinite Scroll (cursor-based pagination)
+- ⚡ Optimistic UI updates
 
 ---
 
@@ -55,19 +66,21 @@ The dashboard summarizes:
 - todo completion rate
 - completed tasks
 
+Past and future dates are displayed in read-only mode.
+
 ---
 
 ### Focus Page
 
 Runs a focus timer for a selected todo.
-When the timer completes, a focus session record is stored in the database.
+
+When the timer completes or the user stops early, a confirmation modal is shown.
+
+On confirmation, a focus session record is stored in the database.
 
 Each session stores:
 
-- `user_id`
-- `todo_id`
-- `duration`
-- `start_time`
+- `user_id`, `todo_id`, `start_time`, `end_time`, `duration`
 
 ---
 
@@ -75,9 +88,9 @@ Each session stores:
 
 Displays historical focus data.
 
-Weekly focus trends are visualized using charts, while daily summaries are presented as cards.
-
-Detailed records can be inspected through modal views.
+- Weekly trends → line chart
+- Focus time → bar chart
+- Daily summaries → cards
 
 ---
 
@@ -102,7 +115,7 @@ Detailed records can be inspected through modal views.
 
 ### Backend / Database
 
-- Supabase (PostgreSQL)
+- Supabase (PostgreSQL + Auth)
 
 ### Visualization
 
@@ -121,15 +134,29 @@ Detailed records can be inspected through modal views.
 
 ## 📊 Architecture Overview
 
-The application separates UI rendering, domain logic, and server state.
+The application follows a layered architecture with clear separation of concerns.
 
-The following diagram illustrates the unidirectional data flow and client-side aggregation pipeline used in the application.
+The system flow below describes the structural data pipeline.
 
-![architecture-diagram-img](./public/images/architecture-diagram.png)
-
-Pages orchestrate application flow and UI composition, while domain logic is encapsulated in reusable hooks.
-
-Feature modules compose these hooks into interactive UI components and implement user-facing interactions.
+```
+Client UI (Pages / Components)
+        ↓
+React Query Hooks (queries / mutations)
+        ↓
+API Layer (api/*.ts)
+        ↓
+Supabase (PostgREST)
+        ↓
+PostgreSQL (focus_sessions, todo)
+        ↓
+React Query Cache
+        ↓
+Client Aggregation Layer (hooks + lib/chart-utils)
+        ↓
+Derived State (dashboard / history hooks)
+        ↓
+Visualization (D3 / UI Components)
+```
 
 ---
 
@@ -137,90 +164,91 @@ Feature modules compose these hooks into interactive UI components and implement
 
 ### Page-level orchestration
 
-Page components coordinate UI composition but avoid implementing domain logic directly.
-
-Instead, they compose hooks and stores that encapsulate behavior.
+Pages coordinate UI composition but avoid domain logic.
 
 ---
 
 ### Domain logic isolation
 
-Todo operations, focus tracking, and analytics logic are implemented in hooks and feature modules rather than page components.
-
-This improves maintainability and testability.
+Business logic lives in hooks and feature modules.
 
 ---
 
 ### Explicit UI state modeling
-
-The UI explicitly models important states:
 
 - loading
 - empty
 - read-only
 - error
 
-These states are represented by dedicated UI components.
-
 ---
 
-### Avoid premature optimization
+### Hybrid aggregation strategy
 
-Complex optimizations such as virtualization or pagination are intentionally postponed until real usage patterns require them.
+- API layer → partial aggregation (daily grouping via client-side reduce inside API functions)
+- Client → final computation (completion rate, focus time metrics)
 
 ---
 
 ## 🔄 Data Flow
 
+The following describes user-driven interaction flow:
+
 ```
-Todo Created (Today Page)
-        ↓
-Focus Timer (Focus Page)
-        ↓
-Focus Session Completed
-        ↓
-Focus Session Stored
-        ↓
-Supabase Database (focus_sessions)
-        ↓
-React Query Hooks
-        ↓
-Client-side Aggregation
-        ↓
-Dashboard / Analytics Hooks
-        ↓
-Visualization Components
+[User Action]
+
+1. Todo operations
+   → useMutation (React Query)
+   → Supabase (insert/update/delete)
+   → Query invalidation & optimistic updates
+
+2. Focus start (Focus Page)
+   → useTimer (client-side state)
+
+3. Focus completed or stopped early
+   → Confirmation modal
+   → createFocusSession (mutation)
+   → Supabase insert
+
+4. Data fetching
+   → useQuery / useInfiniteQuery
+   → Supabase fetch
+
+5. Client aggregation
+   → getDailyAggregation / getAllDailyAggregation (API layer - fetch raw records)
+   → client-side reduce (group by date and sum duration)
+   → useWeeklyFocusAggregation / useAllFocusAggregation (React Query layer)
+   → useDayDashboard / useHistoryDashboard (derive metrics)
+   → chart-utils.ts (fill missing dates and shape data for D3)
+
+6. UI rendering
+   → Dashboard / Charts (D3)
 ```
 
 ---
 
 ## 🧩 Analytics Layers
 
-Analytics are computed on the client from raw session records.
-
 ### Data Fetch Layer
 
 - `useTodayFocusTime`
 - `useTodoFocusTime`
-
-Fetch focus session records and compute total durations.
+- `useWeeklyFocusAggregation`
+- `useAllFocusAggregation`
 
 ---
 
 ### Analytics Layer
 
-- `useDayDashboard`
-
-Combines focus statistics and todo completion metrics to generate dashboard data.
+- API aggregation (daily grouping)
+- Client aggregation (dashboard & history)
 
 ---
 
 ### Visualization Layer
 
-- Dashboard components
-- History charts (D3)
-
-These components present aggregated data in charts and summary cards.
+- Dashboard
+- D3 charts
 
 ---
 
@@ -228,25 +256,23 @@ These components present aggregated data in charts and summary cards.
 
 ```
 src
- ├ api
- ├ components
- ├ constants
- ├ features
- │   ├ dashboard
- │   ├ date
- │   ├ history
- │   └ todo
- ├ hooks
- ├ lib
- ├ pages
- └ provider
- └ store
- └ types
+ ├── api/
+ ├── components/
+ ├── constants/
+ ├── features/
+ │   ├── dashboard/
+ │   ├── date/
+ │   ├── history/
+ │   └── todo/
+ ├── hooks/
+ ├── lib/
+ ├── pages/
+ ├── provider/
+ ├── stores/
+ ├── types/
+ ├── App.tsx
+ └── main.tsx
 ```
-
-This structure separates UI, domain logic, and data access layers.
-
-Domain logic is separated from UI components to keep the system modular and scalable.
 
 ---
 
@@ -254,29 +280,61 @@ Domain logic is separated from UI components to keep the system modular and scal
 
 ### Read-only date model
 
-Past and future dates are treated as read-only to prevent misleading interactions.
+Past and future dates are not editable. Users can only modify todos for the current day.
 
-Users can only modify todos for the current day.
+This is enforced via a `readOnlyVariant` flag in `TodayPage` and an `isReadOnly` flag in `TodoItems`.
 
 ---
 
-### Explicit empty states
+### Optimistic updates
 
-Empty states are intentionally modeled to communicate whether the user can interact with the current context.
+`useUpdateTodo` and `useDeleteTodo` update the React Query cache immediately before the server responds.
+
+On error, the previous cache state is restored via the `onMutate` / `onError` rollback pattern.
+
+This keeps the UI responsive without waiting for network round-trips.
+
+---
+
+### Wall-clock timer
+
+`useTimer` computes elapsed time from `Date.now()` snapshots rather than decrementing a counter on each interval tick.
+
+This prevents timer drift during tab switches, device sleep, or pauses.
+
+---
+
+### Session management
+
+`SessionProvider` listens to Supabase Auth state changes and writes the session to Zustand.
+
+`GlobalLoader` is shown until the initial session check completes, preventing rendering before auth state is resolved.
 
 ---
 
 ### Stateless date navigation
 
-Calendar navigation logic is implemented as stateless utilities to avoid hidden coupling between pages.
+`useWeekNavigation` derives all date values from the `currentDate` prop with no internal state,
+
+keeping navigation logic decoupled from UI.
+
+---
+
+### Client-side analytics
+
+Analytics are computed from raw records on the client rather than using database views.
+
+This simplifies the backend but trades some scalability for flexibility.
 
 ---
 
 ## ⚖️ Trade-offs
 
-- Analytics are computed on the client instead of using database views.
-- Focus history visualization prioritizes clarity over scalability.
-- Mobile UX is functional but not fully optimized for small screens.
+- Client-side aggregation instead of precomputed database aggregation
+- `FocusHistoryPage` fetches all todos and focus records at once rather than paginating server-side — practical for individual users but not suitable for large data volumes
+- The two pagination strategies (cursor-based for Today, client-side slicing for History) are intentionally different based on data access patterns
+- Limited mobile UX optimization
+- No focus session recovery if the user closes the tab mid-session
 
 ---
 
