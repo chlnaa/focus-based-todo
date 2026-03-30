@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createTodo } from '@/api/todo';
-import type { UseMutationCallback } from '@/types/types';
+import type { TodoEntity, UseMutationCallback } from '@/types/types';
 import { todoKeys } from '@/constants/queryKeys';
 import { useSession } from '@/stores/session';
 
@@ -11,16 +11,47 @@ export default function useCreateTodo(callbacks?: UseMutationCallback) {
 
   return useMutation({
     mutationFn: createTodo,
-    onSuccess: async (_, variables) => {
+
+    onMutate: async (newTodo) => {
       if (!userId) return;
 
-      await queryClient.invalidateQueries({
-        queryKey: todoKeys.byDate(variables.date, userId),
+      await queryClient.cancelQueries({
+        queryKey: todoKeys.allTodos(userId),
       });
-      if (callbacks?.onSuccess) callbacks.onSuccess();
+
+      const previous = queryClient.getQueryData<TodoEntity[]>(
+        todoKeys.allTodos(userId),
+      );
+
+      queryClient.setQueryData(
+        todoKeys.allTodos(userId),
+        (old: TodoEntity[] = []) => {
+          return [...old, newTodo];
+        },
+      );
+
+      return { previous };
     },
-    onError: (error) => {
-      if (callbacks?.onError) callbacks.onError(error);
+
+    onError: (_, __, context) => {
+      if (context?.previous && userId) {
+        queryClient.setQueryData(todoKeys.allTodos(userId), context.previous);
+      }
+    },
+
+    onSettled: async (_, __, variables) => {
+      if (!userId) return;
+
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: todoKeys.byDate(variables.date, userId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: todoKeys.allTodos(userId),
+        }),
+      ]);
+
+      callbacks?.onSuccess?.();
     },
   });
 }
