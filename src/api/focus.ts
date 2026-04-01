@@ -12,19 +12,6 @@ export async function createFocusSession(session: FocusInsert) {
   return data;
 }
 
-export async function getFocusSessionsByDate(userId: string, date: string) {
-  const { data, error } = await supabase
-    .from('focus_sessions')
-    .select('*')
-    .eq('user_id', userId)
-    .gte('start_time', `${date}T00:00:00`)
-    .lt('start_time', `${date}T23:59:59`)
-    .order('start_time', { ascending: false });
-
-  if (error) throw error;
-  return data;
-}
-
 export async function getTodayFocusTime(userId: string, date: string) {
   const start = dayjs(date).startOf('day').toDate();
   const end = dayjs(date).add(1, 'day').startOf('day').toDate();
