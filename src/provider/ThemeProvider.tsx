@@ -1,4 +1,5 @@
-import { useThemeStore } from '@/stores/themeStore';
+import type { Theme } from '@/types/types';
+import { useSetTheme } from '@/stores/themeStore';
 import { useEffect } from 'react';
 
 export default function ThemeProvider({
@@ -6,20 +7,11 @@ export default function ThemeProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const setTheme = useThemeStore((s) => s.setTheme);
+  const setTheme = useSetTheme();
 
   useEffect(() => {
-    const stored = localStorage.getItem('theme') as 'light' | 'dark' | null;
-
-    if (stored) {
-      setTheme(stored);
-    } else {
-      const prefersDark = window.matchMedia(
-        '(prefers-color-scheme: dark)',
-      ).matches;
-
-      setTheme(prefersDark ? 'dark' : 'light');
-    }
+    const stored = localStorage.getItem('theme') as Theme | null;
+    setTheme(stored ?? 'system');
   }, [setTheme]);
 
   return <>{children}</>;
