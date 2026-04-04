@@ -1,30 +1,34 @@
+import type { Theme } from '@/types/types';
 import { create } from 'zustand';
-
-type Theme = 'light' | 'dark';
 
 type ThemeStore = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
-  toggleTheme: () => void;
 };
 
-export const useThemeStore = create<ThemeStore>((set) => ({
-  theme: 'light',
+const applyTheme = (theme: Theme) => {
+  const htmlTag = document.documentElement;
+  htmlTag.classList.remove('dark', 'light');
+
+  if (theme === 'system') {
+    const isDarkTheme = window.matchMedia(
+      '(prefers-color-scheme:dark)',
+    ).matches;
+
+    htmlTag.classList.add(isDarkTheme ? 'dark' : 'light');
+  } else {
+    htmlTag.classList.add(theme);
+  }
+};
+
+const useThemeStore = create<ThemeStore>((set) => ({
+  theme: 'system',
 
   setTheme: (theme) => {
     localStorage.setItem('theme', theme);
-    document.documentElement.classList.toggle('dark', theme === 'dark');
-
+    applyTheme(theme);
     set({ theme });
   },
-
-  toggleTheme: () =>
-    set((state) => {
-      const nextTheme = state.theme === 'light' ? 'dark' : 'light';
-
-      localStorage.setItem('theme', nextTheme);
-      document.documentElement.classList.toggle('dark', nextTheme === 'dark');
-
-      return { theme: nextTheme };
-    }),
 }));
+
+export const useSetTheme = () => useThemeStore((store) => store.setTheme);
