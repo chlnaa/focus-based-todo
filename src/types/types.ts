@@ -36,3 +36,5 @@ export interface DailyAggregation {
   date: string;
   totalSeconds: number;
 }
+
+export type Theme = 'system' | 'dark' | 'light';

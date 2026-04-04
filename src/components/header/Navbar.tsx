@@ -1,7 +1,8 @@
-import { AlarmClockCheck, Sun } from 'lucide-react';
+import { AlarmClockCheck } from 'lucide-react';
 import { Link } from 'react-router';
 import MenuButton from './MenuButton';
 import { useSession } from '@/stores/session';
+import ThemeBtn from './ThemeBtn';
 
 export default function Navbar() {
   const session = useSession();
@@ -15,7 +16,7 @@ export default function Navbar() {
         </div>
       </Link>
       <nav className="flex items-center gap-5">
-        <Sun className="w-5 h-5 sm:w-6 sm:h-6" />
+        <ThemeBtn />
         {session && <MenuButton />}
       </nav>
     </header>
