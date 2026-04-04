@@ -1,4 +1,4 @@
-import { Sun } from 'lucide-react';
+import { CheckIcon, Sun } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,11 +6,12 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 import type { Theme } from '@/types/types';
-import { useSetTheme } from '@/stores/themeStore';
+import { useSetTheme, useTheme } from '@/stores/themeStore';
 
 const THEMES: Theme[] = ['system', 'dark', 'light'];
 
 export default function ThemeBtn() {
+  const currentTheme = useTheme();
   const setTheme = useSetTheme();
 
   return (
@@ -22,10 +23,11 @@ export default function ThemeBtn() {
         {THEMES.map((theme) => (
           <DropdownMenuItem key={`theme-button-${theme}`} asChild>
             <div
-              className="hover:bg-muted cursor-pointer p-3"
+              className="hover:bg-muted flex cursor-pointer items-center justify-between p-3"
               onClick={() => setTheme(theme)}
             >
               {theme}
+              {currentTheme === theme && <CheckIcon className="h-4 w-4" />}
             </div>
           </DropdownMenuItem>
         ))}
