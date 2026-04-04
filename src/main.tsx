@@ -18,6 +18,7 @@ import ResetPasswordPage from './pages/ResetPasswordPage.tsx';
 import GuestOnlyLayout from './components/layout/GuestOnlyLayout.tsx';
 import AuthGuardLayout from './components/layout/AuthGuardLayout.tsx';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { ThemeProvider } from 'next-themes';
 
 const queryClient = new QueryClient();
 
@@ -57,12 +58,14 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <SessionProvider>
-        <RouterProvider router={router} />
-        <Toaster richColors position="top-center" />
-      </SessionProvider>
-      {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
-    </QueryClientProvider>
+    <ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <SessionProvider>
+          <RouterProvider router={router} />
+          <Toaster richColors position="top-center" />
+        </SessionProvider>
+        {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+      </QueryClientProvider>
+    </ThemeProvider>
   </StrictMode>,
 );
