@@ -18,7 +18,7 @@ import ResetPasswordPage from './pages/ResetPasswordPage.tsx';
 import GuestOnlyLayout from './components/layout/GuestOnlyLayout.tsx';
 import AuthGuardLayout from './components/layout/AuthGuardLayout.tsx';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { ThemeProvider } from 'next-themes';
+import { ThemeProvider } from './context/ThemeContext.tsx';
 
 const queryClient = new QueryClient();
 
