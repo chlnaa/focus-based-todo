@@ -6,7 +6,7 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 import type { Theme } from '@/types/types';
-import { useSetTheme, useTheme } from '@/stores/themeStore';
+import { useSetTheme, useTheme } from '@/context/ThemeContext';
 
 const THEMES: Theme[] = ['system', 'dark', 'light'];
 
