@@ -22,19 +22,53 @@ export default function CustomDurationModal({
   onOpenChange,
   onSetDuration,
 }: CustomDurationModalProps) {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState<number | ''>('');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+
+    if (val === '') {
+      setValue('');
+      return;
+    }
+
+    const num = Number(val);
+
+    if (isNaN(num)) return;
+
+    if (num < 1) return;
+    if (num > 1440) {
+      setValue(1440);
+      return;
+    }
+
+    setValue(num);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === '-' || e.key === 'e') {
+      e.preventDefault();
+    }
+    if (e.key === 'Enter') handleConfirm();
+  };
 
   const handleConfirm = () => {
-    const mins = Number(value);
-    if (isNaN(mins) || mins <= 0 || mins > 1440) {
+    if (value === '') {
+      toast.error('Invalid Input', {
+        description: 'Please enter a value.',
+      });
+      return;
+    }
+
+    if (value < 1 || value > 1440) {
       toast.error('Invalid Input', {
         description: 'Please enter a time between 1 and 1440 minutes.',
       });
       return;
     }
 
-    onSetDuration(mins);
-    toast.success(`Timer set to ${mins} minutes!`);
+    onSetDuration(value);
+    toast.success(`Timer set to ${value} minutes!`);
     onOpenChange(false);
     setValue('');
   };
@@ -57,9 +91,11 @@ export default function CustomDurationModal({
               id="minutes"
               type="number"
               placeholder="e.g. 25"
+              min={1}
+              max={1440}
               value={value}
-              onChange={(e) => setValue(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleConfirm()}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
               autoFocus
             />
           </div>
