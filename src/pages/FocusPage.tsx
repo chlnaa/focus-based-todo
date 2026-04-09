@@ -46,6 +46,7 @@ export default function FocusPage() {
     resume,
   } = useTimer({
     initialSeconds: 1500,
+    todoId: todoId ?? '',
     onComplete: (elapsedSeconds) => {
       setPreviewTotal(elapsedSeconds);
       setIsCompletionModalOpen(true);
